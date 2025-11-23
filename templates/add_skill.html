@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Add New Skill</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <form method="post" action="add_skill">
+        <div class="input_block">
+            <span class="input_title">Choose Class</span>
+            <select name="class_id">
+                {% for cls in classes %}
+                <option value="{{ cls[0] }}" {% if form.get('class_id')==cls[0]|string %}selected{% endif %}>
+                    {{ cls[1] }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input_block">
+            <span class="input_title">SLUG</span>
+            <input name="slug" type="text" required pattern="^[a-z]+(?:_[a-z]+)*$" value="{{ form.get('slug', '') }}"
+                class="{% if errors.get('slug') %}invalid{% endif %}"
+                oninvalid="this.setCustomValidity('Только латиница, нижний регистр, слова через _')"
+                oninput="this.setCustomValidity('')">
+            {% if errors.get('slug') %}
+            <div class="error">{{ errors['slug'] }}</div>
+            {% endif %}
+        </div>
+
+        <div class="input_block">
+            <span class="input_title">NAME</span>
+            <input name="name_ru" type="text" required pattern="^[А-ЯЁ][а-яё]+(?: [А-ЯЁа-яё]+)*$"
+                value="{{ form.get('name_ru', '') }}" class="{% if errors.get('name_ru') %}invalid{% endif %}"
+                oninvalid="this.setCustomValidity('Только кирриллица, слова разделяются пробелом, никаких символов')"
+                oninput="this.setCustomValidity('')">
+            {% if errors.get('name_ru') %}
+            <div class="error">{{ errors['name_ru'] }}</div>
+            {% endif %}
+        </div>
+        <div class="input_block">
+            <span class="input_title">DESCRIPTION</span>
+            <input name="desc_ru" type="text" required pattern="^[А-ЯЁ][А-ЯЁа-яё0-9 ,:;()\-!?]*\.$"
+                value="{{ form.get('desc_ru', '') }}" class="{% if errors.get('desc_ru') %}invalid{% endif %}"
+                oninvalid="this.setCustomValidity('Только кориллица, допускается любой свободный форма')"
+                oninput="this.setCustomValidity('')">
+            {% if errors.get('desc_ru') %}
+            <div class="error">{{ errors['desc_ru'] }}</div>
+            {% endif %}
+        </div>
+        <button type="submit">submit</button>
+    </form>
+</body>
+
+</html>

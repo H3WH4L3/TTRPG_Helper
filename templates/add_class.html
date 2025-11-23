@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Add New Class</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <form method="POST" action="add_class">
+        <!--SLUG-->
+        <div class="input_block">
+            <span class="input_title">SLUG</span>
+            <input name="slug" type="text" required pattern="^[a-z]+(?:_[a-z]+)*$" value="{{ form.get('slug', '') }}"
+                class="{% if errors.get('slug') %}invalid{% endif %}"
+                oninvalid="this.setCustomValidity('Только латиница, нижний регистр, слова через _')"
+                oninput="this.setCustomValidity('')">
+            {% if errors.get('slug') %}
+            <div class="error">{{ errors['slug'] }}</div>
+            {% endif %}
+        </div>
+        <!--NAME-->
+        <div class="input_block">
+            <span class="input_title">NAME</span>
+            <input type="text" name="name_ru" required pattern="^[А-ЯЁ][а-яё]+(?: [А-ЯЁа-яё]+)*$"
+                value="{{ form.get('name_ru', '') }}" class="{% if errors.get('name_ru') %}invalid{% endif %}"
+                oninvalid="this.setCustomValidity('Только кирриллица, слова разделяются пробелом, никаких символов')"
+                oninput="this.setCustomValidity('')">
+            {% if errors.get('name_ru') %}
+            <div class="error">{{ errors['name_ru'] }}</div>
+            {% endif %}
+        </div>
+        <!--DESCRIPTION-->
+        <div class="input_block">
+            <span class="input_title">DESCRIPTION</span>
+            <input type="text" name="desc_ru" required pattern="^[А-ЯЁ][А-ЯЁа-яё0-9 ,:;()\-!?]*\.$"
+                value="{{ form.get('desc_ru', '') }}" class="{% if errors.get('desc_ru') %}invalid{% endif %}"
+                oninvalid="this.setCustomValidity('Только кориллица, допускается любой свободный форма, в конце точка')"
+                oninput="this.setCustomValidity('')">
+            {% if errors.get('desc_ru') %}
+            <div class="error">{{ errors['desc_ru'] }}</div>
+            {% endif %}
+        </div>
+        <!--HP-->
+        <div class="input_block">
+            <span class="input_title">HP</span>
+            <input type="text" name="hp_formula" pattern="(?:(\d*)d)?(\d+)([+\-])?(\d+)?" required
+                value="{{ form.get('hp_formula', '') }}" class="{% if errors.get('hp_formula') %}invalid{% endif %}"
+                oninvalid="this.setCustomValidity('Только формат вида XdY/XdY±Z (3d6/3d6±2)')"
+                oninput="this.setCustomValidity('')">
+            {% if errors.get('hp_formula') %}
+            <div class="error">{{ errors['hp_formula'] }}</div>
+            {% endif %}
+        </div>
+        <!--MONEY-->
+        <div class="input_block">
+            <span class="input_title">MONEY</span>
+            <input type="text" name="money_formula" pattern="(?:(\d*)d)?(\d+)([+\-])?(\d+)?" required
+                value="{{ form.get('money_formula', '') }}"
+                class="{% if errors.get('money_formula') %}invalid{% endif %}"
+                oninvalid="this.setCustomValidity('Только формат вида XdY/XdY±Z (3d6/3d6±2)')"
+                oninput="this.setCustomValidity('')">
+            {% if errors.get('money_formula') %}
+            <div class="error">{{ errors['money_formula'] }}</div>
+            {% endif %}
+        </div>
+        <!--SIGNS-->
+        <div class="input_block">
+            <span class="input_title">SIGNS</span>
+            <input type="text" name="signs_formula" pattern="(?:(\d*)d)?(\d+)([+\-])?(\d+)?" required
+                value="{{ form.get('signs_formula', '') }}"
+                class="{% if errors.get('signs_formula') %}invalid{% endif %}"
+                oninvalid="this.setCustomValidity('Только формат вида XdY/XdY±Z (3d6/3d6±2)')"
+                oninput="this.setCustomValidity('')">
+            {% if errors.get('signs_formula') %}
+            <div class="error">{{ errors['signs_formula'] }}</div>
+            {% endif %}
+        </div>
+        <!--AGILITY-->
+        <div class="input_block">
+            <span class="input_title">AGILITY</span>
+            <input type="text" name="agility_formula" pattern="(?:(\d*)d)?(\d+)([+\-])?(\d+)?" required
+                value="{{ form.get('agility_formula', '') }}"
+                class="{% if errors.get('agility_formula') %}invalid{% endif %}"
+                oninvalid="this.setCustomValidity('Только формат вида XdY/XdY±Z (3d6/3d6±2)')"
+                oninput="this.setCustomValidity('')">
+            {% if errors.get('agility_formula') %}
+            <div class="error">{{ errors['agility_formula'] }}</div>
+            {% endif %}
+        </div>
+        <!--PRESENCE-->
+        <div class="input_block">
+            <span class="input_title">PRESENCE</span>
+            <input type="text" name="presence_formula" pattern="(?:(\d*)d)?(\d+)([+\-])?(\d+)?" required
+                value="{{ form.get('presence_formula', '') }}"
+                class="{% if errors.get('presence_formula') %}invalid{% endif %}"
+                oninvalid="this.setCustomValidity('Только формат вида XdY/XdY±Z (3d6/3d6±2)')"
+                oninput="this.setCustomValidity('')">
+            {% if errors.get('presence_formula') %}
+            <div class="error">{{ errors['presence_formula'] }}</div>
+            {% endif %}
+        </div>
+        <!--STRENGTH-->
+        <div class="input_block">
+            <span class="input_title">STRENGTH</span>
+            <input type="text" name="strength_formula" pattern="(?:(\d*)d)?(\d+)([+\-])?(\d+)?" required
+                value="{{ form.get('strength_formula', '') }}"
+                class="{% if errors.get('strength_formula') %}invalid{% endif %}"
+                oninvalid="this.setCustomValidity('Только формат вида XdY/XdY±Z (3d6/3d6±2)')"
+                oninput="this.setCustomValidity('')">
+            {% if errors.get('strength_formula') %}
+            <div class="error">{{ errors['strength_formula'] }}</div>
+            {% endif %}
+        </div>
+        <!--TOUGHNESS-->
+        <div class="input_block">
+            <span class="input_title">TOUGHNESS</span>
+            <input type="text" name="toughness_formula" pattern="(?:(\d*)d)?(\d+)([+\-])?(\d+)?" required
+                value="{{ form.get('toughness_formula', '') }}"
+                class="{% if errors.get('toughness_formula') %}invalid{% endif %}"
+                oninvalid="this.setCustomValidity('Только формат вида XdY/XdY±Z (3d6/3d6±2)')"
+                oninput="this.setCustomValidity('')">
+            {% if errors.get('toughness_formula') %}
+            <div class="error">{{ errors['toughness_formula'] }}</div>
+            {% endif %}
+        </div>
+        <!--BONUS-->
+        <div class="input_block">
+            <span class="input_title">BONUS</span>
+            <input type="text" name="bonus_type" pattern="^[А-ЯЁ][А-ЯЁа-яё0-9 ,:;()\-!?]*$" required
+                value="{{ form.get('bonus_type', '') }}" class="{% if errors.get('bonus_type') %}invalid{% endif %}"
+                oninvalid="this.setCustomValidity('Только кориллица, допускается любой свободный форма')"
+                oninput="this.setCustomValidity('')">
+            {% if errors.get('bonus_type') %}
+            <div class="error">{{ errors['bonus_type'] }}</div>
+            {% endif %}
+        </div>
+        <!--WEAPON-->
+        <div class="input_block">
+            <span class="input_title">WEAPON</span>
+            <input type="text" name="weapon_formula" pattern="(?:(\d*)d)?(\d+)([+\-])?(\d+)?" required
+                value="{{ form.get('weapon_formula', '') }}"
+                class="{% if errors.get('weapon_formula') %}invalid{% endif %}"
+                oninvalid="this.setCustomValidity('Только формат вида XdY/XdY±Z (3d6/3d6±2)')"
+                oninput="this.setCustomValidity('')">
+            {% if errors.get('weapon_formula') %}
+            <div class="error">{{ errors['weapon_formula'] }}</div>
+            {% endif %}
+        </div>
+        <!--ARMOR-->
+        <div class="input_block">
+            <span class="input_title">ARMOR</span>
+            <input type="text" name="armor_formula" pattern="(?:(\d*)d)?(\d+)([+\-])?(\d+)?" required
+                value="{{ form.get('armor_formula', '') }}"
+                class="{% if errors.get('armor_formula') %}invalid{% endif %}"
+                oninvalid="this.setCustomValidity('Только формат вида XdY/XdY±Z (3d6/3d6±2)')"
+                oninput="this.setCustomValidity('')">
+            {% if errors.get('armor_formula') %}
+            <div class="error">{{ errors['armor_formula'] }}</div>
+            {% endif %}
+        </div>
+        <!--MEMORIE-->
+        <div class="input_block">
+            <span class="input_title">MEMORIE</span>
+            <input type="text" name="memorie_type" pattern="^[А-ЯЁ][А-ЯЁа-яё0-9 ,:;()\-!?]*$" required
+                value="{{ form.get('memorie_type', '') }}" class="{% if errors.get('memorie_type') %}invalid{% endif %}"
+                oninvalid="this.setCustomValidity('Только кориллица, допускается любой свободный форма')"
+                oninput="this.setCustomValidity('')">
+            {% if errors.get('memorie_type') %}
+            <div class="error">{{ errors['memorie_type'] }}</div>
+            {% endif %}
+        </div>
+        <button type="submit">Add</button>
+    </form>
+</body>
+
+</html>

@@ -49,16 +49,94 @@ def index():
     return render_template("index.html")
 
 
-# ADD BONUSES
 @app.route("/add_bonus", methods=["POST", "GET"])
-def add_bonuse():
+def add_bonus():
     cursor.execute("SELECT id, name_ru FROM classes")
     classes = cursor.fetchall()
 
-    if request.method == "POST":
-        pass
+    if request.method == "GET":
+        empty_bonus = {"slug": "", "name_ru": "", "desc_ru": ""}
+        return render_template(
+            "add_bonus.html",
+            form=[empty_bonus],
+            errors=[{}],
+            classes=classes,
+            selected_class_id="",
+            bonus_type="",
+            type_error="",
+        )
+
+    class_id = request.form.get("class_id", "").strip()
+    bonus_type = request.form.get("bonus_type").strip()
+
+    if not validate_form(describe=bonus_type):
+        type_error = VALIDATION_TEXT["desc"]
     else:
-        return render_template("add_bonuse.html", form={}, errors={}, classes=classes)
+        type_error = ""
+
+    slugs = request.form.getlist("slug[]")
+    names = request.form.getlist("name_ru[]")
+    descs = request.form.getlist("desc_ru[]")
+
+    new_bonus = []
+    errors = []
+
+    for i in range(len(slugs)):
+        bonus_error = {}
+
+        slug = slugs[i].strip()
+        name = names[i].strip()
+        desc = descs[i].strip()
+
+        if not validate_form(slug=slug):
+            bonus_error["slug"] = VALIDATION_TEXT["slug"]
+
+        cursor.execute("SELECT slug FROM bonuses")
+        slugs_bonuses = [i[0] for i in cursor.fetchall()]
+        if slug in slugs_bonuses:
+            bonus_error["slug"] = VALIDATION_TEXT["dublicate"]
+
+        if not validate_form(name=name):
+            bonus_error["name_ru"] = VALIDATION_TEXT["name"]
+
+        if not validate_form(describe=desc):
+            bonus_error["desc_ru"] = VALIDATION_TEXT["desc"]
+
+        errors.append(bonus_error)
+
+        new_bonus.append({"slug": slug, "name_ru": name, "desc_ru": desc})
+    if any(errors) or type_error:
+        return render_template(
+            "add_bonus.html",
+            form=new_bonus,
+            errors=errors,
+            classes=classes,
+            selected_class_id=class_id,
+            bonus_type=bonus_type,
+            type_error=type_error,
+        )
+
+    # Добавляем в базу
+    cursor.execute(
+        "UPDATE classes SET bonus_type=%s WHERE id=%s",
+        (bonus_type, int(class_id)),
+    )
+
+    for bonus in new_bonus:
+        keys, placeholder = execute_param(bonus)
+        # Добавляем бонус
+        cursor.execute(
+            f"INSERT INTO bonuses ({keys}) VALUES ({placeholder}) RETURNING id;",
+            tuple(bonus.values()),
+        )
+        bonus_id = cursor.fetchone()[0]
+
+        cursor.execute(
+            "INSERT INTO class_bonuses (class_id, bonus_id) VALUES (%s, %s);",
+            (int(class_id), bonus_id),
+        )
+    connection.commit()
+    return redirect(url_for("index"))
 
 
 # ADD NEW SKILL

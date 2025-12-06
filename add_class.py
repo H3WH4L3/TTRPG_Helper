@@ -432,5 +432,49 @@ def add_narrative():
     return redirect(url_for("index"))
 
 
+# ADD ARMOR
+@app.route("/add_armor", methods=["POST", "GET"])
+def add_armor():
+    if request.method == "GET":
+        return render_template("add_armor.html", form={}, errors={})
+
+    new_armor = {}
+    armor_errors = {}
+
+    new_armor["slug"] = request.form.get("slug", "").strip()
+    new_armor["name_ru"] = request.form.get("name_ru", "").strip()
+    new_armor["armor_level"] = request.form.get("armor_level", "").strip()
+    new_armor["effect"] = request.form.get("effect", "").strip()
+
+    cursor.execute("SELECT slug FROM armors;")
+    slugs_armor = [i[0] for i in cursor.fetchall()]
+    if new_armor["slug"] in slugs_armor:
+        armor_errors["slug"] = VALIDATION_TEXT["dublicate"]
+    if not validate_form(slug=new_armor["slug"]):
+        armor_errors["slug"] = VALIDATION_TEXT["slug"]
+    if not validate_form(name=new_armor["name_ru"]):
+        armor_errors["name_ru"] = VALIDATION_TEXT["name"]
+    if not 0 <= int(new_armor["armor_level"]) <= 10:
+        armor_errors["armor_level"] = "Значением может быть только число от 0 до 10"
+    if (
+        not validate_form(describe=new_armor["effect"])
+        and len(new_armor["effect"]) >= 1
+    ):
+        armor_errors["effect"] = VALIDATION_TEXT["desc"]
+
+    if armor_errors:
+        return render_template("add_armor.html", form=new_armor, errors=armor_errors)
+
+    keys, placeholder = execute_param(new_armor)
+
+    cursor.execute(
+        f"INSERT INTO armors ({keys}) VALUES ({placeholder});",
+        tuple(new_armor.values()),
+    )
+
+    connection.commit()
+    return redirect(url_for("index"))
+
+
 if __name__ == "__main__":
     app.run(debug=True)

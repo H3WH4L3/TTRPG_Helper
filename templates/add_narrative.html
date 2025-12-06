@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Add New Narrative Info</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <form method="POST" action="/add_narrative">
+
+        <!-- CATEGORIES -->
+        <div class="category-block">
+            <select name="category">
+                {% for cat in categories %}
+                <option 
+                    value="{{ cat[0] }}" 
+                    {% if selected_category==cat[0]|string %}
+                        selected
+                    {% endif %}
+                >
+                    {{ cat[1] }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="narrativ-block">
+
+            <!-- SLUG -->
+            <div class="slug-block">
+                <span class="input-title">SLUG</span>
+                <input
+                    type="text"
+                    name="slug"
+                    value="{{ form.get('slug', '') }}"
+                >
+                {% if errors['slug'] %}
+                    <div class="error">{{ errors['slug'] }}</div>
+                {% endif %}
+            </div>
+
+            <!-- TEXT -->
+            <div class="name-block">
+                <span class="input-title">TEXT</span>
+                <input
+                    type="text"
+                    name="text_ru"
+                    value="{{ form.get('text_ru', '') }}"
+                >
+                {% if errors['text_ru'] %}
+                    <div class="error">{{ errors['text_ru'] }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <button type="submit" name="action" value="save">SUBMIT</button>
+    </form>
+</body>
+
+</html>

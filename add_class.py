@@ -145,46 +145,77 @@ def add_skill():
     cursor.execute("SELECT id, name_ru FROM classes")
     classes = cursor.fetchall()
 
-    errors = {}
-    new_skill = {}
+    if request.method == "GET":
+        empty_skill = {"slug": "", "name_ru": "", "desc_ru": ""}
+        return render_template(
+            "add_skill.html",
+            form=[empty_skill],
+            errors=[{}],
+            classes=classes,
+            selected_class_id="",
+        )
 
-    if request.method == "POST":
-        class_id = request.form.get("class_id").strip()
-        new_skill["slug"] = request.form.get("slug", "").strip()
-        new_skill["name_ru"] = request.form.get("name_ru", "").strip()
-        new_skill["desc_ru"] = request.form.get("desc_ru", "").strip()
+    # Extracting all values from form
+    class_id = request.form.get("class_id", "").strip()
+    slugs = request.form.getlist("slug[]")
+    names = request.form.getlist("name_ru[]")
+    descs = request.form.getlist("desc_ru[]")
 
-        if not validate_form(slug=new_skill["slug"]):
-            errors["slug"] = VALIDATION_TEXT["slug"]
+    new_skill = []
+    errors = []
+
+    for i in range(len(slugs)):
+        skill_error = {}
+
+        slug = slugs[i].strip()
+        name = names[i].strip()
+        desc = descs[i].strip()
+
+        if not validate_form(slug=slug):
+            skill_error["slug"] = VALIDATION_TEXT["slug"]
 
         cursor.execute("SELECT slug FROM skills")
         slugs_skills = [i[0] for i in cursor.fetchall()]
-        if new_skill["slug"] in slugs_skills:
-            errors["slug"] = VALIDATION_TEXT["dublicate"]
-        if not validate_form(name=new_skill["name_ru"]):
-            errors["name_ru"] = VALIDATION_TEXT["name"]
-        if not validate_form(describe=new_skill["desc_ru"]):
-            errors["desc_ru"] = VALIDATION_TEXT["desc"]
+        if slug in slugs_skills:
+            skill_error["slug"] = VALIDATION_TEXT["dublicate"]
 
-        if errors:
-            return render_template(
-                "add_skill.html", errors=errors, form=new_skill, classes=classes
-            )
+        if not validate_form(name=name):
+            skill_error["name_ru"] = VALIDATION_TEXT["name"]
 
-        keys, placeholder = execute_param(new_skill)
+        if not validate_form(describe=desc):
+            skill_error["desc_ru"] = VALIDATION_TEXT["desc"]
+
+        errors.append(skill_error)
+
+        new_skill.append({"slug": slug, "name_ru": name, "desc_ru": desc})
+
+    if any(errors):
+        return render_template(
+            "add_skill.html",
+            form=new_skill,
+            errors=errors,
+            classes=classes,
+            selected_class_id=class_id,
+        )
+
+    for skill in new_skill:
+        keys, placeholder = execute_param(skill)
+
+        # Adding Skill to main table
         cursor.execute(
             f"INSERT INTO skills ({keys}) VALUES ({placeholder}) RETURNING id;",
-            tuple(new_skill.values()),
+            tuple(skill.values()),
         )
         skill_id = cursor.fetchone()[0]
+
+        # Adding link between ids
         cursor.execute(
             "INSERT INTO class_skills (class_id, skill_id) VALUES (%s, %s);",
             (int(class_id), skill_id),
         )
-        connection.commit()
-        return redirect(url_for("index"))
-    else:
-        return render_template("add_skill.html", form={}, errors={}, classes=classes)
+
+    connection.commit()
+    return redirect(url_for("index"))
 
 
 # ADD NEW CLASS

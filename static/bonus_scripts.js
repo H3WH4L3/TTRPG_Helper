@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const container = document.getElementById("bonuses");
-    const addBtn = document.getElementById("add");
+    const addBtn = document.getElementById("add-bonus");
 
     if (!container) {
         console.log("No #bonuses container found");

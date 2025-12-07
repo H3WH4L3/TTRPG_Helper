@@ -476,5 +476,56 @@ def add_armor():
     return redirect(url_for("index"))
 
 
+# ADD WEAPON
+@app.route("/add_weapon", methods=["POST", "GET"])
+def add_weapon():
+    if request.method == "GET":
+        return render_template("add_weapon.html", form={}, errors={})
+
+    new_weapon = {}
+    weapon_errors = {}
+
+    new_weapon["slug"] = request.form.get("slug", "").strip()
+    new_weapon["name_ru"] = request.form.get("name_ru", "").strip()
+    new_weapon["damage"] = request.form.get("damage", "").strip()
+    new_weapon["effect"] = request.form.get("effect", "").strip()
+    new_weapon["ammo"] = request.form.get("ammo", "").strip()
+
+    cursor.execute("SELECT slug FROM weapons;")
+    slugs_weapon = [i[0] for i in cursor.fetchall()]
+
+    if new_weapon["slug"] in slugs_weapon:
+        weapon_errors["slug"] = VALIDATION_TEXT["dublicate"]
+    if not validate_form(slug=new_weapon["slug"]):
+        weapon_errors["slug"] = VALIDATION_TEXT["slug"]
+    if not validate_form(name=new_weapon["name_ru"]):
+        weapon_errors["name_ru"] = VALIDATION_TEXT["name"]
+    if not validate_form(formula=new_weapon["damage"]):
+        weapon_errors["damage"] = VALIDATION_TEXT["formula"]
+    if (
+        not validate_form(describe=new_weapon["effect"])
+        and len(new_weapon["effect"]) >= 1
+    ):
+        weapon_errors["damage"] = VALIDATION_TEXT["desc"] + ". Либо пустая строка."
+    if new_weapon["ammo"]:
+        if not 0 <= int(new_weapon["ammo"]) <= 30:
+            weapon_errors["ammo"] = "Значением может быть только число от 0 до 30"
+    else:
+        weapon_errors["ammo"] = "Значение не может быть пустым"
+
+    if weapon_errors:
+        return render_template("add_weapon.html", form=new_weapon, errors=weapon_errors)
+
+    keys, placeholder = execute_param(new_weapon)
+
+    cursor.execute(
+        f"INSERT INTO weapons ({keys}) VALUES ({placeholder});",
+        tuple(new_weapon.values()),
+    )
+
+    connection.commit()
+    return redirect(url_for("index"))
+
+
 if __name__ == "__main__":
     app.run(debug=True)

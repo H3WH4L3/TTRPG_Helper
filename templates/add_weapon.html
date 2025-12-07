@@ -1,0 +1,79 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>WEAPON</title>
+</head>
+<body>
+    <form method="POST" action="/add_weapon">
+        <div class="weapon-block">
+
+            <!-- SLUG -->
+            <div class="slug-block">
+                <span class="input-title">SLUG</span>
+                <input
+                    type="text"
+                    name="slug"
+                    value="{{ form.get('slug', '') }}"
+                >
+                {% if errors['slug'] %}
+                    <div class="error">{{ errors['slug'] }}</div>
+                {% endif %}
+            </div>
+
+            <!-- NAME -->
+            <div class="name-block">
+                <span class="input-title">NAME</span>
+                <input
+                    type="text"
+                    name="name_ru"
+                    value="{{ form.get('name_ru', '') }}"
+                >
+                {% if errors['name_ru'] %}
+                <div class="error">{{ errors['name_ru'] }}</div>
+                {% endif %}
+            </div>
+
+            <!-- DAMAGE -->
+            <div class="damage-block">
+                <span class="input-title">DAMAGE</span>
+                <input
+                    type="text"
+                    name="damage"
+                    value="{{ form.get('damage', '') }}"
+                >
+                {% if errors['damage'] %}
+                <div class="error">{{ errors['damage'] }}</div>
+                {% endif %}
+            </div>
+
+            <!-- EFFECT -->
+            <div class="effect-block">
+                <span class="input-title">EFFECT</span>
+                <input
+                    type="text"
+                    name="effect"
+                    value="{{ form.get('effect', '') }}"
+                >
+                {% if errors['effect'] %}
+                <div class="error">{{ errors['effect'] }}</div>
+                {% endif %}
+            </div>
+
+            <!-- AMMO -->
+            <div class="ammo-block">
+                <span class="input-title">AMMO</span>
+                <input
+                    type="number"
+                    name="ammo"
+                    value="{{ form.get('ammo', '') }}"
+                >
+                {% if errors['ammo'] %}
+                <div class="error">{{ errors['ammo'] }}</div>
+                {% endif %}
+            </div>
+        </div>
+        <button type="submit" name="action" value="save">SUBMIT</button>
+    </form>
+</body>
+</html>

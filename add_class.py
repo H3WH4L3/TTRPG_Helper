@@ -493,34 +493,38 @@ def add_weapon():
 
     cursor.execute("SELECT slug FROM weapons;")
     slugs_weapon = [i[0] for i in cursor.fetchall()]
-
     if new_weapon["slug"] in slugs_weapon:
         weapon_errors["slug"] = VALIDATION_TEXT["dublicate"]
+
     if not validate_form(slug=new_weapon["slug"]):
         weapon_errors["slug"] = VALIDATION_TEXT["slug"]
+
     if not validate_form(name=new_weapon["name_ru"]):
         weapon_errors["name_ru"] = VALIDATION_TEXT["name"]
+
     if not validate_form(formula=new_weapon["damage"]):
         weapon_errors["damage"] = VALIDATION_TEXT["formula"]
-    if (
-        not validate_form(describe=new_weapon["effect"])
-        and len(new_weapon["effect"]) >= 1
-    ):
-        weapon_errors["damage"] = VALIDATION_TEXT["desc"] + ". Либо пустая строка."
+
+    if new_weapon["effect"]:
+        if not validate_form(describe=new_weapon["effect"]):
+            weapon_errors["effect"] = VALIDATION_TEXT["desc"] + ". Либо пустая строка"
+
     if new_weapon["ammo"]:
-        if not 0 <= int(new_weapon["ammo"]) <= 30:
-            weapon_errors["ammo"] = "Значением может быть только число от 0 до 30"
-    else:
-        weapon_errors["ammo"] = "Значение не может быть пустым"
+        if not 0 <= int(new_weapon["ammo"]) <= 60:
+            weapon_errors["ammo"] = "Значением может быть только число от 0 до 60"
 
     if weapon_errors:
         return render_template("add_weapon.html", form=new_weapon, errors=weapon_errors)
 
-    keys, placeholder = execute_param(new_weapon)
+    db_weapon = new_weapon.copy()
+    db_weapon["effect"] = db_weapon["effect"] if db_weapon["effect"] else None
+    db_weapon["ammo"] = int(db_weapon["ammo"]) if db_weapon["ammo"] else None
+
+    keys, placeholder = execute_param(db_weapon)
 
     cursor.execute(
         f"INSERT INTO weapons ({keys}) VALUES ({placeholder});",
-        tuple(new_weapon.values()),
+        tuple(db_weapon.values()),
     )
 
     connection.commit()

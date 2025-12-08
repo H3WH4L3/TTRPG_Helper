@@ -87,12 +87,16 @@ def add_class():
     slugs_classes = [i[0] for i in cursor.fetchall()]
     if not validate_form(slug=new_class["slug"]) and "1" in new_class["slug"]:
         errors["slug"] = VALIDATION_TEXT["slug"]
+
     if new_class["slug"] in slugs_classes:
         errors["slug"] = VALIDATION_TEXT["dublicate"]
+
     if not validate_form(name=new_class["name_ru"]):
         errors["name_ru"] = VALIDATION_TEXT["name"]
+
     if not validate_form(describe=new_class["desc_ru"]):
         errors["desc_ru"] = VALIDATION_TEXT["desc"]
+
     for key, value in new_class.items():
         if key.endswith("formula"):
             if not validate_form(formula=value):
@@ -102,6 +106,7 @@ def add_class():
     if errors:
         return render_template("add_class.html", errors=errors, form=new_class)
 
+    db_class = new_class.copy()
     keys, placeholders = execute_param(new_class)
     cursor.execute(
         f"""
@@ -111,7 +116,7 @@ def add_class():
                 )
                 VALUES ({placeholders})
                 """,
-        tuple(new_class.values()),
+        tuple(db_class.values()),
     )
     connection.commit()
     return redirect(url_for("index"))
@@ -176,7 +181,9 @@ def add_skill():
             selected_class_id=class_id,
         )
 
-    for skill in new_skill:
+    db_skill = new_skill.copy()
+
+    for skill in db_skill:
         keys, placeholder = execute_param(skill)
 
         # Adding Skill to main table
@@ -264,13 +271,15 @@ def add_bonus():
             type_error=type_error,
         )
 
+    db_bonuses = new_bonus.copy()
+
     # Добавляем в базу
     cursor.execute(
         "UPDATE classes SET bonus_type=%s WHERE id=%s",
         (bonus_type, int(class_id)),
     )
 
-    for bonus in new_bonus:
+    for bonus in db_bonuses:
         keys, placeholder = execute_param(bonus)
         # Добавляем бонус
         cursor.execute(
@@ -356,13 +365,15 @@ def add_memorie():
             type_error=type_error,
         )
 
+    db_memorie = new_memorie.copy()
+
     # Adding new memories
     cursor.execute(
         "UPDATE classes SET memorie_type=%s WHERE id=%s",
         (memorie_type, int(class_id)),
     )
 
-    for memorie in new_memorie:
+    for memorie in db_memorie:
         keys, placeholder = execute_param(memorie)
 
         cursor.execute(
@@ -402,7 +413,6 @@ def add_narrative():
         "SELECT slug FROM narrative WHERE category=%s", (new_narrative["category"],)
     )
     slugs_narrative = [i[0] for i in cursor.fetchall()]
-
     if new_narrative["slug"] in slugs_narrative:
         narrative_errors["slug"] = VALIDATION_TEXT["dublicate"]
 
@@ -421,11 +431,13 @@ def add_narrative():
             selected_category=new_narrative["category"],
         )
 
-    keys, placeholder = execute_param(new_narrative)
+    db_narrative = new_narrative.copy()
+
+    keys, placeholder = execute_param(db_narrative)
 
     cursor.execute(
         f"INSERT INTO narrative ({keys}) VALUES ({placeholder});",
-        tuple(new_narrative.values()),
+        tuple(db_narrative.values()),
     )
 
     connection.commit()

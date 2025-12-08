@@ -18,15 +18,18 @@ connection = psycopg2.connect(
 cursor = connection.cursor()
 
 VALIDATION_TEXT = {
+    "empty": "Значение не может быть пустым",
     "slug": "Только латиница, нижний регистр, слова через _",
     "name": "Только кирриллица, слова разделяются пробелом, никаких символов",
     "desc": "Только кориллица, допускается любой свободный форма, в конце точка",
     "formula": "Только формат вида XdY/XdY±Z (3d6/3d6±2)",
     "dublicate": "Такой id уже есть в базе!",
+    "count": "Только число от 0 до {} (включительно)",
+    "or_empty": ". Либо оставьте пустым.",
 }
 
 
-def validate_form(slug=None, name=None, describe=None, formula=None):
+def validate_form(slug=None, name=None, describe=None, formula=None, count=None):
     if slug:
         return re.fullmatch(r"^[a-z]+(?:_[a-z]+)*$", slug)
     if name:
@@ -35,6 +38,8 @@ def validate_form(slug=None, name=None, describe=None, formula=None):
         return re.fullmatch(r"^[А-ЯЁ][А-ЯЁа-яё0-9 ,:;()\-!?]*\.$", describe)
     if formula:
         return re.fullmatch(r"(?:(\d*)d)?(\d+)([+\-])?(\d+)?", formula)
+    if count:
+        return 0 <= int(count[0]) <= count[1]
 
 
 def execute_param(result: dict) -> tuple:
@@ -53,6 +58,132 @@ narrative_category_translator = {
 }
 
 
+def simple_upload_db(db_fragment, table):
+
+    keys, placeholders = execute_param(db_fragment)
+    cursor.execute(
+        f"""
+                    INSERT INTO {table}
+                    (
+                    {keys}
+                    )
+                    VALUES ({placeholders})
+                    """,
+        tuple(db_fragment.values()),
+    )
+
+
+def upload_db_returning(db_fragment, table, class_id):
+
+    keys, placeholders = execute_param(db_fragment)
+
+    # UPLOAD ELEMENT TO MAIN TABLE
+    cursor.execute(
+        f"INSERT INTO {table} ({keys}) VALUES ({placeholders}) RETURNING id;",
+        tuple(db_fragment.values()),
+    )
+    element_id = cursor.fetchone()[0]
+
+    # ADDING LINK BETWEEN ID
+    cursor.execute(
+        f"INSERT INTO {"class_" + table} (class_id, {table + "_id"}) VALUES ({class_id}, {element_id});"
+    )
+
+
+def check_for_valid(form, table, slugs=None):
+    errors = {}
+
+    # UNIQUE SLUGS
+    if not slugs:
+        cursor.execute(f"SELECT slug FROM {table}")
+        slugs = [i[0] for i in cursor.fetchall()]
+
+    # SLUG
+    if "slug" in form.keys():
+        if not form["slug"]:
+            errors["slug"] = VALIDATION_TEXT["empty"]
+        elif not validate_form(slug=form["slug"]):
+            errors["slug"] = VALIDATION_TEXT["slug"]
+        elif form["slug"] in slugs:
+            errors["slug"] = VALIDATION_TEXT["dublicate"]
+        form.pop("slug")
+
+    # NAME
+    if "name_ru" in form.keys():
+        if not form["name_ru"]:
+            errors["name_ru"] = VALIDATION_TEXT["empty"]
+        elif not validate_form(name=form["name_ru"]):
+            errors["name_ru"] = VALIDATION_TEXT["name"]
+        form.pop("name_ru")
+
+    # DESCRIBE
+    if "desc_ru" in form.keys():
+        if not form["desc_ru"]:
+            errors["desc_ru"] = VALIDATION_TEXT["empty"]
+        elif not validate_form(describe=form["desc_ru"]):
+            errors["desc_ru"] = VALIDATION_TEXT["desc"]
+        form.pop("desc_ru")
+
+    # TEXT
+    if "text_ru" in form.keys():
+        if not form["text_ru"]:
+            errors["text_ru"] = VALIDATION_TEXT["empty"]
+        elif not validate_form(describe=form["text_ru"]):
+            errors["test_ru"] = VALIDATION_TEXT["desc"]
+        form.pop("text_ru")
+
+    # ARMOR LEVE
+    if "armor_level" in form.keys():
+        if not form["armor_level"]:
+            errors["armor_level"] = VALIDATION_TEXT["empty"]
+        elif not validate_form(count=(form["armor_level"], 10)):
+            errors["armor_level"] = VALIDATION_TEXT["count"].format(10)
+        form.pop("armor_level")
+
+    # EFFECT
+    if "effect" in form.keys() and form["effect"]:
+        if not validate_form(describe=form["effect"]):
+            errors["effect"] = VALIDATION_TEXT["desc"] + VALIDATION_TEXT["or_empty"]
+        form.pop("effect")
+
+    # DAMAGE
+    if "damage" in form.keys():
+        if not form["damage"]:
+            errors["damage"] = VALIDATION_TEXT["empty"]
+        elif not validate_form(formula=form["damage"]):
+            errors["damage"] = VALIDATION_TEXT["formula"]
+        form.pop("damage")
+
+    # AMMO
+    if "ammo" in form.keys() and form["ammo"]:
+        if not validate_form(count=(form["ammo"], 60)):
+            errors["ammo"] = (
+                VALIDATION_TEXT["count"].format(60) + VALIDATION_TEXT["or_empty"]
+            )
+        form.pop("ammo")
+
+    # COUNTS
+    if "counts" in form.keys() and form["counts"]:
+        if not validate_form(describe=form["counts"]):
+            errors["counts"] = VALIDATION_TEXT["desc"] + VALIDATION_TEXT["or_empty"]
+        form.pop("counts")
+
+    # COST
+    if "cost" in form.keys() and form["cost"]:
+        if not validate_form(describe=form["cost"]):
+            errors["cost"] = VALIDATION_TEXT["desc"] + VALIDATION_TEXT["or_empty"]
+        form.pop("cost")
+
+    # FORMULA
+    for key, value in form.items():
+        if key.endswith("formula"):
+            if not validate_form(formula=value):
+                errors[key] = VALIDATION_TEXT["formula"]
+        form.pop(key)
+
+    return errors
+
+
 # MAIN PAGE
 @app.route("/")
 def index():
@@ -65,59 +196,32 @@ def add_class():
     if request.method == "GET":
         return render_template("add_class.html", form={}, errors={})
 
-    errors = {}
+    columns = (
+        "slug",
+        "name_ru",
+        "desc_ru",
+        "hp_formula",
+        "signs_formula",
+        "agility_formula",
+        "presence_formula",
+        "strength_formula",
+        "toughness_formula",
+        "weapon_formula",
+        "armor_forumla",
+    )
     new_class = {}
+    for column in columns:
+        new_class[column] = request.form.get(column, "").strip()
 
-    # Taking all values
-    new_class["slug"] = request.form.get("slug", "").strip()
-    new_class["name_ru"] = request.form.get("name_ru", "").strip()
-    new_class["desc_ru"] = request.form.get("desc_ru", "").strip()
-    new_class["hp_formula"] = request.form.get("hp_formula", "").strip()
-    new_class["money_formula"] = request.form.get("money_formula", "").strip()
-    new_class["signs_formula"] = request.form.get("signs_formula", "").strip()
-    new_class["agility_formula"] = request.form.get("agility_formula", "").strip()
-    new_class["presence_formula"] = request.form.get("presence_formula", "").strip()
-    new_class["strength_formula"] = request.form.get("strength_formula", "").strip()
-    new_class["toughness_formula"] = request.form.get("toughness_formula", "").strip()
-    new_class["weapon_formula"] = request.form.get("weapon_formula", "").strip()
-    new_class["armor_formula"] = request.form.get("armor_formula", "").strip()
-
-    # Checking for errors
-    cursor.execute("SELECT slug FROM classes")
-    slugs_classes = [i[0] for i in cursor.fetchall()]
-    if not validate_form(slug=new_class["slug"]) and "1" in new_class["slug"]:
-        errors["slug"] = VALIDATION_TEXT["slug"]
-
-    if new_class["slug"] in slugs_classes:
-        errors["slug"] = VALIDATION_TEXT["dublicate"]
-
-    if not validate_form(name=new_class["name_ru"]):
-        errors["name_ru"] = VALIDATION_TEXT["name"]
-
-    if not validate_form(describe=new_class["desc_ru"]):
-        errors["desc_ru"] = VALIDATION_TEXT["desc"]
-
-    for key, value in new_class.items():
-        if key.endswith("formula"):
-            if not validate_form(formula=value):
-                errors[key] = VALIDATION_TEXT["formula"]
-
-    # If there any errors -> Render template with error messages
+    # VALIDATION
+    errors = check_for_valid(new_class)
     if errors:
         return render_template("add_class.html", errors=errors, form=new_class)
 
+    # UPLOAD TO DB
     db_class = new_class.copy()
-    keys, placeholders = execute_param(new_class)
-    cursor.execute(
-        f"""
-                INSERT INTO classes
-                (
-                {keys}
-                )
-                VALUES ({placeholders})
-                """,
-        tuple(db_class.values()),
-    )
+    simple_upload_db(db_class, "classes")
+
     connection.commit()
     return redirect(url_for("index"))
 
@@ -125,6 +229,7 @@ def add_class():
 # ADD NEW SKILL
 @app.route("/add_skill", methods=["POST", "GET"])
 def add_skill():
+    # CLASSES
     cursor.execute("SELECT id, name_ru FROM classes")
     classes = cursor.fetchall()
 
@@ -147,30 +252,16 @@ def add_skill():
     new_skill = []
     errors = []
 
+    # VALIDATION
     for i in range(len(slugs)):
-        skill_error = {}
-
-        slug = slugs[i].strip()
-        name = names[i].strip()
-        desc = descs[i].strip()
-
-        if not validate_form(slug=slug):
-            skill_error["slug"] = VALIDATION_TEXT["slug"]
-
-        cursor.execute("SELECT slug FROM skills")
-        slugs_skills = [i[0] for i in cursor.fetchall()]
-        if slug in slugs_skills:
-            skill_error["slug"] = VALIDATION_TEXT["dublicate"]
-
-        if not validate_form(name=name):
-            skill_error["name_ru"] = VALIDATION_TEXT["name"]
-
-        if not validate_form(describe=desc):
-            skill_error["desc_ru"] = VALIDATION_TEXT["desc"]
-
-        errors.append(skill_error)
-
-        new_skill.append({"slug": slug, "name_ru": name, "desc_ru": desc})
+        form = {
+            "slug": slugs[i].strip(),
+            "name_ru": names[i].strip(),
+            "desc_ru": descs[i].strip(),
+        }
+        error = check_for_valid(form, " skills")
+        errors.append(error)
+        new_skill.append(form)
 
     if any(errors):
         return render_template(
@@ -181,23 +272,10 @@ def add_skill():
             selected_class_id=class_id,
         )
 
+    # UPLOAD TO DB
     db_skill = new_skill.copy()
-
     for skill in db_skill:
-        keys, placeholder = execute_param(skill)
-
-        # Adding Skill to main table
-        cursor.execute(
-            f"INSERT INTO skills ({keys}) VALUES ({placeholder}) RETURNING id;",
-            tuple(skill.values()),
-        )
-        skill_id = cursor.fetchone()[0]
-
-        # Adding link between ids
-        cursor.execute(
-            "INSERT INTO class_skills (class_id, skill_id) VALUES (%s, %s);",
-            (int(class_id), skill_id),
-        )
+        upload_db_returning(skill, "skills", class_id)
 
     connection.commit()
     return redirect(url_for("index"))
@@ -206,6 +284,7 @@ def add_skill():
 # ADD NEW BONUS
 @app.route("/add_bonus", methods=["POST", "GET"])
 def add_bonus():
+    # CLASSES
     cursor.execute("SELECT id, name_ru FROM classes")
     classes = cursor.fetchall()
 
@@ -233,33 +312,21 @@ def add_bonus():
     names = request.form.getlist("name_ru[]")
     descs = request.form.getlist("desc_ru[]")
 
+    # VALIDATION
     new_bonus = []
     errors = []
 
     for i in range(len(slugs)):
-        bonus_error = {}
+        form = {
+            "slug": slugs[i].strip(),
+            "name_ru": names[i].strip(),
+            "desc_ru": descs[i].strip(),
+        }
+        error = check_for_valid(form, "bonuses")
 
-        slug = slugs[i].strip()
-        name = names[i].strip()
-        desc = descs[i].strip()
+        errors.append(error)
+        new_bonus.append(form)
 
-        if not validate_form(slug=slug):
-            bonus_error["slug"] = VALIDATION_TEXT["slug"]
-
-        cursor.execute("SELECT slug FROM bonuses")
-        slugs_bonuses = [i[0] for i in cursor.fetchall()]
-        if slug in slugs_bonuses:
-            bonus_error["slug"] = VALIDATION_TEXT["dublicate"]
-
-        if not validate_form(name=name):
-            bonus_error["name_ru"] = VALIDATION_TEXT["name"]
-
-        if not validate_form(describe=desc):
-            bonus_error["desc_ru"] = VALIDATION_TEXT["desc"]
-
-        errors.append(bonus_error)
-
-        new_bonus.append({"slug": slug, "name_ru": name, "desc_ru": desc})
     if any(errors) or type_error:
         return render_template(
             "add_bonus.html",
@@ -271,27 +338,15 @@ def add_bonus():
             type_error=type_error,
         )
 
+    # UPLOAD TO DB
     db_bonuses = new_bonus.copy()
-
-    # Добавляем в базу
     cursor.execute(
         "UPDATE classes SET bonus_type=%s WHERE id=%s",
         (bonus_type, int(class_id)),
     )
-
     for bonus in db_bonuses:
-        keys, placeholder = execute_param(bonus)
-        # Добавляем бонус
-        cursor.execute(
-            f"INSERT INTO bonuses ({keys}) VALUES ({placeholder}) RETURNING id;",
-            tuple(bonus.values()),
-        )
-        bonus_id = cursor.fetchone()[0]
+        upload_db_returning(bonus, "bonuses", class_id)
 
-        cursor.execute(
-            "INSERT INTO class_bonuses (class_id, bonus_id) VALUES (%s, %s);",
-            (int(class_id), bonus_id),
-        )
     connection.commit()
     return redirect(url_for("index"))
 
@@ -299,6 +354,7 @@ def add_bonus():
 # ADD NEW MEMORIE
 @app.route("/add_memorie", methods=["POST", "GET"])
 def add_memorie():
+    # CLASSES
     cursor.execute("SELECT id, name_ru FROM classes")
     classes = cursor.fetchall()
 
@@ -326,33 +382,20 @@ def add_memorie():
     names = request.form.getlist("name_ru[]")
     descs = request.form.getlist("desc_ru[]")
 
+    # VALIDATION
     new_memorie = []
     errors = []
 
     for i in range(len(slugs)):
         memorie_error = {}
-
-        slug = slugs[i].strip()
-        name = names[i].strip()
-        desc = descs[i].strip()
-
-        if not validate_form(slug=slug):
-            memorie_error["slug"] = VALIDATION_TEXT["slug"]
-
-        cursor.execute("SELECT slug FROM memories")
-        slugs_memories = [i[0] for i in cursor.fetchall()]
-        if slug in slugs_memories:
-            memorie_error["slug"] = VALIDATION_TEXT["dublicate"]
-
-        if not validate_form(name=name):
-            memorie_error["name_ru"] = VALIDATION_TEXT["name"]
-
-        if not validate_form(describe=desc):
-            memorie_error["desc_ru"] = VALIDATION_TEXT["desc"]
-
-        errors.append(memorie_error)
-
-        new_memorie.append({"slug": slug, "name_ru": name, "desc_ru": desc})
+        form = {
+            "slug": slugs[i].strip(),
+            "name_ru": names[i].strip(),
+            "desc_ru": descs[i].strip(),
+        }
+        error = check_for_valid(form, "memories")
+        errors.append(error)
+        new_memorie.append(form)
 
     if any(errors) or type_error:
         return render_template(
@@ -365,27 +408,15 @@ def add_memorie():
             type_error=type_error,
         )
 
+    # UPLOAD TO DB
     db_memorie = new_memorie.copy()
-
-    # Adding new memories
     cursor.execute(
         "UPDATE classes SET memorie_type=%s WHERE id=%s",
         (memorie_type, int(class_id)),
     )
 
     for memorie in db_memorie:
-        keys, placeholder = execute_param(memorie)
-
-        cursor.execute(
-            f"INSERT INTO memories ({keys}) VALUES ({placeholder}) RETURNING id;",
-            tuple(memorie.values()),
-        )
-        memorie_id = cursor.fetchone()[0]
-
-        cursor.execute(
-            "INSERT INTO class_memories (class_id, memorie_id) VALUES (%s, %s);",
-            (int(class_id), memorie_id),
-        )
+        upload_db_returning(memorie, "memories", class_id)
     connection.commit()
     return redirect(url_for("index"))
 
@@ -395,7 +426,6 @@ def add_memorie():
 def add_narrative():
     cursor.execute("SELECT DISTINCT category FROM narrative;")
     categories = [i[0] for i in cursor.fetchall()]
-
     categories = [(el, narrative_category_translator[el]) for el in categories]
 
     if request.method == "GET":
@@ -403,42 +433,29 @@ def add_narrative():
             "add_narrative.html", form={}, errors={}, categories=categories
         )
     new_narrative = {}
-    narrative_errors = {}
-
     new_narrative["slug"] = request.form.get("slug", "").strip()
     new_narrative["category"] = request.form.get("category", "").strip()
     new_narrative["text_ru"] = request.form.get("text_ru", "").strip()
 
+    # VALIDATION
     cursor.execute(
         "SELECT slug FROM narrative WHERE category=%s", (new_narrative["category"],)
     )
     slugs_narrative = [i[0] for i in cursor.fetchall()]
-    if new_narrative["slug"] in slugs_narrative:
-        narrative_errors["slug"] = VALIDATION_TEXT["dublicate"]
+    errors = check_for_valid(new_narrative, "narrative", slugs_narrative)
 
-    if not validate_form(slug=new_narrative["slug"]):
-        narrative_errors["slug"] = VALIDATION_TEXT["slug"]
-
-    if not validate_form(name=new_narrative["text_ru"]):
-        narrative_errors["text_ru"] = VALIDATION_TEXT["name"]
-
-    if narrative_errors:
+    if errors:
         return render_template(
             "add_narrative.html",
             form=new_narrative,
-            errors=narrative_errors,
+            errors=errors,
             categories=categories,
             selected_category=new_narrative["category"],
         )
 
+    # UPLOAD TO DB
     db_narrative = new_narrative.copy()
-
-    keys, placeholder = execute_param(db_narrative)
-
-    cursor.execute(
-        f"INSERT INTO narrative ({keys}) VALUES ({placeholder});",
-        tuple(db_narrative.values()),
-    )
+    simple_upload_db(db_narrative, "narrative")
 
     connection.commit()
     return redirect(url_for("index"))
@@ -447,110 +464,59 @@ def add_narrative():
 # ADD ARMOR
 @app.route("/add_armor", methods=["POST", "GET"])
 def add_armor():
+    table = "armors"
     if request.method == "GET":
         return render_template("add_armor.html", form={}, errors={})
 
+    # GETTING ALL VALUES
     new_armor = {}
-    armor_errors = {}
-
     new_armor["slug"] = request.form.get("slug", "").strip()
     new_armor["name_ru"] = request.form.get("name_ru", "").strip()
     new_armor["armor_level"] = request.form.get("armor_level", "").strip()
     new_armor["effect"] = request.form.get("effect", "").strip()
 
-    cursor.execute("SELECT slug FROM armors;")
-    slugs_armor = [i[0] for i in cursor.fetchall()]
-    if new_armor["slug"] in slugs_armor:
-        armor_errors["slug"] = VALIDATION_TEXT["dublicate"]
+    # VALIDATION
+    errors = check_for_valid(new_armor, table)
+    if errors:
+        return render_template("add_armor.html", form=new_armor, errors=errors)
 
-    if not validate_form(slug=new_armor["slug"]):
-        armor_errors["slug"] = VALIDATION_TEXT["slug"]
-
-    if not validate_form(name=new_armor["name_ru"]):
-        armor_errors["name_ru"] = VALIDATION_TEXT["name"]
-
-    if new_armor["armor_level"]:
-        if not 0 <= int(new_armor["armor_level"]) <= 10:
-            armor_errors["armor_level"] = "Значением может быть только число от 0 до 10"
-
-    if new_armor["effect"]:
-        if not validate_form(describe=new_armor["effect"]):
-            armor_errors["effect"] = VALIDATION_TEXT["desc"]
-
-    if armor_errors:
-        return render_template("add_armor.html", form=new_armor, errors=armor_errors)
-
+    # UPLOAD TO BASE
     db_armor = new_armor.copy()
     db_armor["armor_level"] = (
         int(db_armor["armor_level"]) if db_armor["armor_level"] else None
     )
     db_armor["effect"] = db_armor["effect"] if db_armor["effect"] else None
-
-    keys, placeholder = execute_param(db_armor)
-
-    cursor.execute(
-        f"INSERT INTO armors ({keys}) VALUES ({placeholder});",
-        tuple(db_armor.values()),
-    )
-
+    simple_upload_db(db_armor, table)
     connection.commit()
+
     return redirect(url_for("index"))
 
 
 # ADD WEAPON
 @app.route("/add_weapon", methods=["POST", "GET"])
 def add_weapon():
+    table = "weapons"
     if request.method == "GET":
         return render_template("add_weapon.html", form={}, errors={})
 
     new_weapon = {}
-    weapon_errors = {}
-
     new_weapon["slug"] = request.form.get("slug", "").strip()
     new_weapon["name_ru"] = request.form.get("name_ru", "").strip()
     new_weapon["damage"] = request.form.get("damage", "").strip()
     new_weapon["effect"] = request.form.get("effect", "").strip()
     new_weapon["ammo"] = request.form.get("ammo", "").strip()
 
-    cursor.execute("SELECT slug FROM weapons;")
-    slugs_weapon = [i[0] for i in cursor.fetchall()]
-    if new_weapon["slug"] in slugs_weapon:
-        weapon_errors["slug"] = VALIDATION_TEXT["dublicate"]
-
-    if not validate_form(slug=new_weapon["slug"]):
-        weapon_errors["slug"] = VALIDATION_TEXT["slug"]
-
-    if not validate_form(name=new_weapon["name_ru"]):
-        weapon_errors["name_ru"] = VALIDATION_TEXT["name"]
-
-    if not validate_form(formula=new_weapon["damage"]):
-        weapon_errors["damage"] = VALIDATION_TEXT["formula"]
-
-    if new_weapon["effect"]:
-        if not validate_form(describe=new_weapon["effect"]):
-            weapon_errors["effect"] = VALIDATION_TEXT["desc"] + ". Либо пустая строка"
-
-    if new_weapon["ammo"]:
-        if not 0 <= int(new_weapon["ammo"]) <= 60:
-            weapon_errors["ammo"] = (
-                "Значением может быть только число от 0 до 60. Либо пустая строка"
-            )
-
-    if weapon_errors:
-        return render_template("add_weapon.html", form=new_weapon, errors=weapon_errors)
+    errors = check_for_valid(new_weapon, table)
+    if errors:
+        return render_template("add_weapon.html", form=new_weapon, errors=errors)
 
     db_weapon = new_weapon.copy()
     db_weapon["effect"] = db_weapon["effect"] if db_weapon["effect"] else None
     db_weapon["ammo"] = int(db_weapon["ammo"]) if db_weapon["ammo"] else None
 
-    keys, placeholder = execute_param(db_weapon)
-
-    cursor.execute(
-        f"INSERT INTO weapons ({keys}) VALUES ({placeholder});",
-        tuple(db_weapon.values()),
-    )
-
+    simple_upload_db(db_weapon, table)
     connection.commit()
+
     return redirect(url_for("index"))
 
 
@@ -568,8 +534,6 @@ def add_item():
         )
 
     new_item = {}
-    item_error = {}
-
     new_item["slug"] = request.form.get("slug", "").strip()
     new_item["name_ru"] = request.form.get("name_ru", "").strip()
     new_item["effect"] = request.form.get("effect", "").strip()
@@ -577,49 +541,56 @@ def add_item():
     new_item["cost"] = request.form.get("cost", "").strip()
     new_item["category"] = request.form.get("category", "").strip()
 
-    cursor.execute("SELECT slug FROM items;")
-    slugs_items = [i[0] for i in cursor.fetchall()]
+    # VALIDATION
+    errors = check_for_valid(new_item, "items")
 
-    if new_item["slug"] in slugs_items:
-        item_error["slug"] = VALIDATION_TEXT["dublicate"]
-
-    if not validate_form(slug=new_item["slug"]):
-        item_error["slug"] = VALIDATION_TEXT["slug"]
-
-    if not validate_form(name=new_item["name_ru"]):
-        item_error["name_ru"] = VALIDATION_TEXT["name"]
-
-    if new_item["effect"]:
-        if not validate_form(describe=new_item["effect"]):
-            item_error["effect"] = VALIDATION_TEXT["desc"] + ". Либо пустая строка"
-
-    if new_item["counts"]:
-        if not validate_form(describe=new_item["counts"]):
-            item_error["counts"] = VALIDATION_TEXT["desc"] + ". Либо пустая строка"
-
-    if new_item["cost"]:
-        if not validate_form(describe=new_item["cost"]):
-            item_error["cost"] = VALIDATION_TEXT["desc"] + ". Либо пустая строка"
-
-    if item_error:
+    if errors:
         return render_template(
-            "add_item.html", form=new_item, error=item_error, categories=categories
+            "add_item.html", form=new_item, error=errors, categories=categories
         )
 
+    # UPLOAD TO DB
     db_item = new_item.copy()
     db_item["effect"] = db_item["effect"] if db_item["effect"] else None
     db_item["counts"] = db_item["counts"] if db_item["counts"] else None
     db_item["cost"] = int(db_item["cost"]) if db_item["cost"] else None
 
-    keys, placeholder = execute_param(db_item)
-
-    cursor.execute(
-        f"INSERT INTO items ({keys}) VALUES ({placeholder});",
-        tuple(db_item.values()),
-    )
+    simple_upload_db(db_item, "items")
 
     connection.commit()
     return redirect(url_for("index"))
+
+
+class New_Character:
+    pass
+
+
+@app.route("/path/class", methods=["POST", "GET"])
+def path_class():
+    if request.method == "POST":
+        errors = check_for_valid()
+    class_id = request.form.get("class_id", "").strip()
+    columns = (
+        "slug",
+        "name_ru",
+        "desc_ru",
+        "hp_formula",
+        "signs_formula",
+        "agility_formula",
+        "presence_formula",
+        "strength_formula",
+        "toughness_formula",
+        "weapon_formula",
+        "armor_forumla",
+    )
+    new_class = {}
+    for column in columns:
+        new_class[column] = request.form.get(column, "").strip()
+
+    errors = check_for_valid(new_class)
+    if errors:
+        return render_template("add_class.html", errors=errors, form=new_class)
+    return redirect(url_for("path/skills", class_id=class_id))
 
 
 if __name__ == "__main__":

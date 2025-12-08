@@ -450,26 +450,35 @@ def add_armor():
     slugs_armor = [i[0] for i in cursor.fetchall()]
     if new_armor["slug"] in slugs_armor:
         armor_errors["slug"] = VALIDATION_TEXT["dublicate"]
+
     if not validate_form(slug=new_armor["slug"]):
         armor_errors["slug"] = VALIDATION_TEXT["slug"]
+
     if not validate_form(name=new_armor["name_ru"]):
         armor_errors["name_ru"] = VALIDATION_TEXT["name"]
-    if not 0 <= int(new_armor["armor_level"]) <= 10:
-        armor_errors["armor_level"] = "Значением может быть только число от 0 до 10"
-    if (
-        not validate_form(describe=new_armor["effect"])
-        and len(new_armor["effect"]) >= 1
-    ):
-        armor_errors["effect"] = VALIDATION_TEXT["desc"]
+
+    if new_armor["armor_level"]:
+        if not 0 <= int(new_armor["armor_level"]) <= 10:
+            armor_errors["armor_level"] = "Значением может быть только число от 0 до 10"
+
+    if new_armor["effect"]:
+        if not validate_form(describe=new_armor["effect"]):
+            armor_errors["effect"] = VALIDATION_TEXT["desc"]
 
     if armor_errors:
         return render_template("add_armor.html", form=new_armor, errors=armor_errors)
 
-    keys, placeholder = execute_param(new_armor)
+    db_armor = new_armor.copy()
+    db_armor["armor_level"] = (
+        int(db_armor["armor_level"]) if db_armor["armor_level"] else None
+    )
+    db_armor["effect"] = db_armor["effect"] if db_armor["effect"] else None
+
+    keys, placeholder = execute_param(db_armor)
 
     cursor.execute(
         f"INSERT INTO armors ({keys}) VALUES ({placeholder});",
-        tuple(new_armor.values()),
+        tuple(db_armor.values()),
     )
 
     connection.commit()

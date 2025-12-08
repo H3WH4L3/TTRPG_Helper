@@ -527,5 +527,71 @@ def add_weapon():
     return redirect(url_for("index"))
 
 
+# ADD ITEMS
+@app.route("/add_item", methods=["POST", "GET"])
+def add_item():
+    categories = [
+        ("", "Ничего"),
+        ("sacred_scroll", "Священный свиток"),
+        ("wicked_scroll", "Проклятый свиток"),
+    ]
+    if request.method == "GET":
+        return render_template(
+            "add_item.html", form={}, error={}, categories=categories
+        )
+
+    new_item = {}
+    item_error = {}
+
+    new_item["slug"] = request.form.get("slug", "").strip()
+    new_item["name_ru"] = request.form.get("name_ru", "").strip()
+    new_item["effect"] = request.form.get("effect", "").strip()
+    new_item["counts"] = request.form.get("counts", "").strip()
+    new_item["cost"] = request.form.get("cost", "").strip()
+    new_item["category"] = request.form.get("category", "").strip()
+
+    new_item["counts"] = int(new_item["counts"]) if new_item["counts"] else None
+    new_item["cost"] = int(new_item["cost"]) if new_item["cost"] else None
+    new_item["category"] = new_item["category"] or None
+
+    cursor.execute("SELECT slug FROM items;")
+    slugs_items = [i[0] for i in cursor.fetchall()]
+
+    if new_item["slug"] in slugs_items:
+        item_error["slug"] = VALIDATION_TEXT["dublicate"]
+
+    if not validate_form(slug=new_item["slug"]):
+        item_error["slug"] = VALIDATION_TEXT["slug"]
+
+    if not validate_form(name=new_item["name_ru"]):
+        item_error["name_ru"] = VALIDATION_TEXT["name"]
+
+    if not validate_form(describe=new_item["effect"]):
+        item_error["effect"] = VALIDATION_TEXT["desc"]
+
+    if new_item["counts"]:
+        if not validate_form(describe=new_item["counts"]):
+            item_error["counts"] = VALIDATION_TEXT["desc"]
+
+    if new_item["cost"]:
+        if not validate_form(describe=new_item["cost"]):
+            item_error["cost"] = VALIDATION_TEXT["desc"]
+
+    if item_error:
+        return render_template(
+            "add_item.html", form=new_item, error=item_error, categories=categories
+        )
+
+    keys, placeholder = execute_param(new_item)
+
+    cursor.execute(
+        f"INSERT INTO items ({keys}) VALUES ({placeholder});",
+        tuple(new_item.values()),
+    )
+
+    connection.commit()
+    return redirect(url_for("index"))
+
+
 if __name__ == "__main__":
     app.run(debug=True)

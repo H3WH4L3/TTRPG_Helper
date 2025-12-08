@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>ITEM</title>
+</head>
+<body>
+    <form method="POST" action="/add_item">
+        <div class="item-block">
+
+            <!-- CATEGORY -->
+            <div class="catrgory-block">
+                <select name="category">
+                    {% for cat in categories %}
+                    <option 
+                        value="{{ cat[0] }}" 
+                        {% if form.get('category', '')==cat[0]|string %}selected{% endif %}
+                    >
+                        {{ cat[1] }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- SLUG -->
+            <div class="slug-block">
+                <span class="input-title">SLUG</span>
+                <input
+                    type="text"
+                    name="slug"
+                    value="{{ form.get('slug', '') }}"
+                >
+                {% if error['slug'] %}
+                    <div class="error">{{ error['slug'] }}</div>
+                {% endif %}
+            </div>
+
+            <!-- NAME -->
+            <div class="name-block">
+                <span class="input-title">NAME</span>
+                <input
+                    type="text"
+                    name="name_ru"
+                    value="{{ form.get('name_ru', '') }}"
+                >
+                {% if error['name_ru'] %}
+                <div class="error">{{ error['name_ru'] }}</div>
+                {% endif %}
+            </div>
+
+            <!-- EFFECT -->
+            <div class="effect-block">
+                <span class="input-title">EFFECT</span>
+                <input
+                    type="text"
+                    name="effect"
+                    value="{{ form.get('effect', '') }}"
+                >
+                {% if error['effect'] %}
+                <div class="error">{{ error['effect'] }}</div>
+                {% endif %}
+            </div>
+
+            <!-- COUNTS -->
+            <div class="counts-block">
+                <span class="input-title">COUNTS</span>
+                <input
+                    type="number"
+                    name="counts"
+                    value="{{ form.get('counts', '') }}"
+                >
+                {% if error['counts'] %}
+                <div class="error">{{ error['counts'] }}</div>
+                {% endif %}
+            </div>
+
+            <!-- COST -->
+            <div class="cost-block">
+                <span class="input-title">COST</span>
+                <input
+                    type="number"
+                    name="cost"
+                    value="{{ form.get('cost', '') }}"
+                >
+                {% if error['cost'] %}
+                <div class="error">{{ error['cost'] }}</div>
+                {% endif %}
+            </div>
+
+        </div>
+        <button type="submit" name="action" value="save">SUBMIT</button>
+    </form>
+</body>
+</html>

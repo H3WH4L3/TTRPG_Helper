@@ -511,7 +511,9 @@ def add_weapon():
 
     if new_weapon["ammo"]:
         if not 0 <= int(new_weapon["ammo"]) <= 60:
-            weapon_errors["ammo"] = "Значением может быть только число от 0 до 60"
+            weapon_errors["ammo"] = (
+                "Значением может быть только число от 0 до 60. Либо пустая строка"
+            )
 
     if weapon_errors:
         return render_template("add_weapon.html", form=new_weapon, errors=weapon_errors)
@@ -554,10 +556,6 @@ def add_item():
     new_item["cost"] = request.form.get("cost", "").strip()
     new_item["category"] = request.form.get("category", "").strip()
 
-    new_item["counts"] = int(new_item["counts"]) if new_item["counts"] else None
-    new_item["cost"] = int(new_item["cost"]) if new_item["cost"] else None
-    new_item["category"] = new_item["category"] or None
-
     cursor.execute("SELECT slug FROM items;")
     slugs_items = [i[0] for i in cursor.fetchall()]
 
@@ -570,27 +568,33 @@ def add_item():
     if not validate_form(name=new_item["name_ru"]):
         item_error["name_ru"] = VALIDATION_TEXT["name"]
 
-    if not validate_form(describe=new_item["effect"]):
-        item_error["effect"] = VALIDATION_TEXT["desc"]
+    if new_item["effect"]:
+        if not validate_form(describe=new_item["effect"]):
+            item_error["effect"] = VALIDATION_TEXT["desc"] + ". Либо пустая строка"
 
     if new_item["counts"]:
         if not validate_form(describe=new_item["counts"]):
-            item_error["counts"] = VALIDATION_TEXT["desc"]
+            item_error["counts"] = VALIDATION_TEXT["desc"] + ". Либо пустая строка"
 
     if new_item["cost"]:
         if not validate_form(describe=new_item["cost"]):
-            item_error["cost"] = VALIDATION_TEXT["desc"]
+            item_error["cost"] = VALIDATION_TEXT["desc"] + ". Либо пустая строка"
 
     if item_error:
         return render_template(
             "add_item.html", form=new_item, error=item_error, categories=categories
         )
 
-    keys, placeholder = execute_param(new_item)
+    db_item = new_item.copy()
+    db_item["effect"] = db_item["effect"] if db_item["effect"] else None
+    db_item["counts"] = db_item["counts"] if db_item["counts"] else None
+    db_item["cost"] = int(db_item["cost"]) if db_item["cost"] else None
+
+    keys, placeholder = execute_param(db_item)
 
     cursor.execute(
         f"INSERT INTO items ({keys}) VALUES ({placeholder});",
-        tuple(new_item.values()),
+        tuple(db_item.values()),
     )
 
     connection.commit()

@@ -2,7 +2,6 @@ import re
 import psycopg2
 from flask import Flask, render_template, request, redirect, url_for, g, session
 from dotenv import load_dotenv
-from dataclasses import dataclass
 import os
 
 load_dotenv()
@@ -556,6 +555,8 @@ def add_item():
 # PATH # 1
 @app.route("/path/class", methods=["POST", "GET"])
 def path_class():
+    if "final_step" not in session:
+        session["final_step"] = False
     if request.method == "GET":
         return render_template("add_class.html", form={}, errors={})
 
@@ -584,6 +585,8 @@ def path_class():
         return render_template("add_class.html", form=new_class, errors=errors)
 
     session["class"] = new_class
+    if session["final_step"]:
+        return redirect(url_for("confirm_result"))
 
     return redirect(url_for("path_skills"))
 
@@ -614,7 +617,7 @@ def path_skills():
             "name_ru": names[i].strip(),
             "desc_ru": descs[i].strip(),
         }
-        error = check_for_valid(form, " skills")
+        error = check_for_valid(form, "skills")
         errors.append(error)
         new_skill.append(form)
 
@@ -626,6 +629,9 @@ def path_skills():
             choosen_class=session["class"]["name_ru"],
         )
     session["skills"] = new_skill
+
+    if session["final_step"]:
+        return redirect(url_for("confirm_result"))
 
     return redirect(url_for("path_bonuses"))
 
@@ -644,7 +650,7 @@ def path_bonuses():
             choosen_class=session["class"]["name_ru"],
         )
 
-    bonus_type = request.form.get("bonus_type").strip()
+    bonus_type = request.form.get("bonus_type", "").strip()
 
     if not validate_form(describe=bonus_type):
         type_error = VALIDATION_TEXT["desc"]
@@ -683,6 +689,9 @@ def path_bonuses():
     session["bonuses"] = new_bonus
     session["bonus_type"] = bonus_type
 
+    if session["final_step"]:
+        return redirect(url_for("confirm_result"))
+
     return redirect(url_for("path_memories"))
 
 
@@ -700,7 +709,7 @@ def path_memories():
             choosen_class=session["class"]["name_ru"],
         )
 
-    memorie_type = request.form.get("memorie_type").strip()
+    memorie_type = request.form.get("memorie_type", "").strip()
 
     if not validate_form(describe=memorie_type):
         type_error = VALIDATION_TEXT["desc"]
@@ -716,7 +725,6 @@ def path_memories():
     errors = []
 
     for i in range(len(slugs)):
-        memorie_error = {}
         form = {
             "slug": slugs[i].strip(),
             "name_ru": names[i].strip(),
@@ -742,10 +750,42 @@ def path_memories():
     return redirect(url_for("confirm_result"))
 
 
+# Confirm Full Class valuation before uploading
 @app.route("/path/confirm", methods=["POST", "GET"])
 def confirm_result():
     if request.method == "GET":
+        session["final_step"] = True
         return render_template("confirm_result.html", session=session)
+
+    # IF WE WANT TO CHANGE SOMETHING
+    action = request.form.get("action")
+    if action == "change_class":
+        return render_template("add_class.html", form=session["class"], errors={})
+    elif action == "change_skills":
+        return render_template(
+            "add_skills.html",
+            form=session["skills"],
+            choosen_class=session["class"]["name_ru"],
+            errors=[{}],
+        )
+    elif action == "change_bonuses":
+        return render_template(
+            "add_bonuses.html",
+            form=session["bonuses"],
+            bonus_type=session["bonus_type"],
+            choosen_class=session["class"]["name_ru"],
+            errors=[{}],
+            type_error="",
+        )
+    elif action == "change_memories":
+        return render_template(
+            "add_memories.html",
+            form=session["memories"],
+            memorie_type=session["memorie_type"],
+            choosen_class=session["class"]["name_ru"],
+            errors=[{}],
+            type_error="",
+        )
 
     # UPLOAD TO DB
 
@@ -761,7 +801,7 @@ def confirm_result():
     for skill in session["skills"]:
         upload_db_returning(skill, "skills", class_id)
 
-    # BONUSES
+        # BONUSES
     cursor.execute(
         "UPDATE classes SET bonus_type = %s WHERE id = %s",
         (session["bonus_type"], class_id),
@@ -770,7 +810,7 @@ def confirm_result():
     for bonus in session["bonuses"]:
         upload_db_returning(bonus, "bonuses", class_id)
 
-    # MEMORIES
+        # MEMORIES
     cursor.execute(
         "UPDATE classes SET memorie_type = %s WHERE id = %s",
         (session["memorie_type"], class_id),
@@ -779,7 +819,37 @@ def confirm_result():
         upload_db_returning(memorie, "memories", class_id)
     connection.commit()
 
+    session.clear()
     return redirect(url_for("index"))
+
+
+# Delete Tests Valuation from DB
+@app.route("/path/delete_test", methods=["POST"])
+def delete_test():
+    with connection:
+        # Chained data first
+        cursor.execute(
+            "DELETE FROM class_bonuses "
+            "WHERE class_id IN (SELECT id FROM classes WHERE slug LIKE 'test_%');"
+        )
+        cursor.execute(
+            "DELETE FROM class_memories "
+            "WHERE class_id IN (SELECT id FROM classes WHERE slug LIKE 'test_%');"
+        )
+        cursor.execute(
+            "DELETE FROM class_skills "
+            "WHERE class_id IN (SELECT id FROM classes WHERE slug LIKE 'test_%');"
+        )
+
+        # Main tables second
+        cursor.execute("DELETE FROM bonuses  WHERE slug LIKE 'test_%';")
+        cursor.execute("DELETE FROM memories WHERE slug LIKE 'test_%';")
+        cursor.execute("DELETE FROM skills   WHERE slug LIKE 'test_%';")
+
+        # Class table third
+        cursor.execute("DELETE FROM classes  WHERE slug LIKE 'test_%';")
+
+    return "ok", 200
 
 
 if __name__ == "__main__":

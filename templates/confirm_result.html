@@ -10,51 +10,68 @@
     <form method="POST">
         <div id="class-block">
             <!-- Class -->
-            <h1> Standart valuation of class</h1>
+            <div class="class-info">
+                <h1> Standart valuation of class</h1>
 
-            <p>{{ session['class']['name_ru'] }} </p>
-            <p>{{ session['class']['slug'] }} </p>
-            <p>{{ session['class']['desc_ru'] }} </p>
-            <p>{{ session['class']['hp_formula'] }} </p>
-            <p>{{ session['class']['money_formula'] }} </p>
-            <p>{{ session['class']['signs_formula'] }} </p>
-            <p>{{ session['class']['agility_formula'] }} </p>
-            <p>{{ session['class']['presence_formula'] }} </p>
-            <p>{{ session['class']['strength_formula'] }} </p>
-            <p>{{ session['class']['toughness_formula'] }} </p>
-            <p>{{ session['class']['weapon_formula'] }} </p>
-            <p>{{ session['class']['armor_formula'] }} </p>
+                <p>{{ session['class']['name_ru'] }} </p>
+                <p>{{ session['class']['slug'] }} </p>
+                <p>{{ session['class']['desc_ru'] }} </p>
+                <p>{{ session['class']['hp_formula'] }} </p>
+                <p>{{ session['class']['money_formula'] }} </p>
+                <p>{{ session['class']['signs_formula'] }} </p>
+                <p>{{ session['class']['agility_formula'] }} </p>
+                <p>{{ session['class']['presence_formula'] }} </p>
+                <p>{{ session['class']['strength_formula'] }} </p>
+                <p>{{ session['class']['toughness_formula'] }} </p>
+                <p>{{ session['class']['weapon_formula'] }} </p>
+                <p>{{ session['class']['armor_formula'] }} </p>
+
+                <button type="submit" name="action" value="change_class">Change Class</button>
+            </div>
 
             <!-- Skills -->
-            <h1> All new skills </h1>
-            {% for i in range(session['skills']|length) %}
-            <h3>Class # {{ i + 1 }}</h3>
-            <p>{{ session['skills'][i]['name_ru']}} </p>
-            <p>{{ session['skills'][i]['slug']}} </p>
-            <p>{{ session['skills'][i]['desc_ru']}} </p>
-            {% endfor %}
+            <div class="skills-info">
+                <h1> All new skills </h1>
+                {% for i in range(session['skills']|length) %}
+                <h3>Class # {{ i + 1 }}</h3>
+                <p>{{ session['skills'][i]['name_ru']}} </p>
+                <p>{{ session['skills'][i]['slug']}} </p>
+                <p>{{ session['skills'][i]['desc_ru']}} </p>
+                {% endfor %}
+
+                <button type="submit" name="action" value="change_skills">Change Skills</button>
+            </div>
 
             <!-- Bonuses -->
-            <h1> All new Bonuses</h1>
-            <h2> {{ session['bonus_type'] }}</h2>
-            {% for i in range(session['bonuses']|length) %}
-            <h3>Bonus # {{ i + 1 }}</h3>
-            <p>{{ session['bonuses'][i]['name_ru']}} </p>
-            <p>{{ session['bonuses'][i]['slug']}} </p>
-            <p>{{ session['bonuses'][i]['desc_ru']}} </p>
-            {% endfor %}
+            <div class="bonuses-info">
+                <h1> All new Bonuses</h1>
+                <h2> {{ session['bonus_type'] }}</h2>
+                {% for i in range(session['bonuses']|length) %}
+                <h3>Bonus # {{ i + 1 }}</h3>
+                <p>{{ session['bonuses'][i]['name_ru']}} </p>
+                <p>{{ session['bonuses'][i]['slug']}} </p>
+                <p>{{ session['bonuses'][i]['desc_ru']}} </p>
+                {% endfor %}
+                
+                <button type="submit" name="action" value="change_bonuses">Change Bonuses</button>
+            </div>
 
             <!-- Memories -->
-            <h1> All memories </h1>
-            <h2> {{ session['memorie_type'] }}</h2>
-            {% for i in range(session['memories']|length) %}
-            <h3>Memorie # {{ i + 1 }}</h3>
-            <p>{{ session['memories'][i]['name_ru']}} </p>
-            <p>{{ session['memories'][i]['slug']}} </p>
-            <p>{{ session['memories'][i]['desc_ru']}} </p>
-            {% endfor %}
+            <div class="memories-info">
+                <h1> All memories </h1>
+                <h2> {{ session['memorie_type'] }}</h2>
+                {% for i in range(session['memories']|length) %}
+                <h3>Memorie # {{ i + 1 }}</h3>
+                <p>{{ session['memories'][i]['name_ru']}} </p>
+                <p>{{ session['memories'][i]['slug']}} </p>
+                <p>{{ session['memories'][i]['desc_ru']}} </p>
+                {% endfor %}
+
+                <button type="submit" name="action" value="chane_memories">Change Memories</button>
+            </div>
+
         </div>
-        <button type="submit">Add</button>
+        <button type="submit" name="action" value="save">Add</button>
     </form>
 </body>
 

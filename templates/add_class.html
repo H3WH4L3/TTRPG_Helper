@@ -7,7 +7,7 @@
 </head>
 
 <body>
-    <form method="POST" action="add_class">
+    <form method="POST" action="{{ url_for('path_class')}}">
         <div id="class-block">
             <div class="information-block">
                 <!-- NAME -->
@@ -17,10 +17,9 @@
                     <input
                         type="text"
                         name="name_ru"
-                        required
                         value="{{ form.get('name_ru', '') }}"
                     >
-                    {% if errors.get(name_ru) %}
+                    {% if errors.get('name_ru') %}
                         <div class="error">{{ errors['name_ru'] }}</div>
                     {% endif %}
                 </div>
@@ -32,7 +31,6 @@
                     <input
                         type="text"
                         name="slug"
-                        required
                         value="{{ form.get('slug', '') }}"
                     >
                     {% if errors.get('slug') %}
@@ -47,7 +45,6 @@
                     <input
                         type="text"
                         name="desc_ru"
-                        required
                         value="{{ form.get('desc_ru', '') }}"
                     >
                     {% if errors.get('desc_ru') %}
@@ -64,7 +61,6 @@
                     <input
                         type="text"
                         name="hp_formula"
-                        required
                         value="{{ form.get('hp_formula', '') }}"
                     >
                     {% if errors.get('hp_formula') %}
@@ -79,7 +75,6 @@
                     <input
                         type="text"
                         name="money_formula"
-                        required
                         value="{{ form.get('money_formula','') }}"
                     >
                     {% if errors.get('money_formula') %}
@@ -94,7 +89,6 @@
                     <input
                         type="text"
                         name="signs_formula"
-                        required
                         value="{{ form.get('signs_formula', '') }}"
                     >
                     {% if errors.get('signs_formula') %}
@@ -111,7 +105,6 @@
                     <input
                         type="text"
                         name="agility_formula"
-                        required
                         value="{{ form.get('agility_formula', '') }}"
                     >
                     {% if errors.get('agility_formula') %}
@@ -126,7 +119,6 @@
                     <input
                         type="text"
                         name="presence_formula"
-                        required
                         value="{{ form.get('presence_formula', '') }}"
                     >
                     {% if errors.get('presence_formula') %}
@@ -141,7 +133,6 @@
                     <input
                         type="text"
                         name="strength_formula"
-                        required
                         value="{{ form.get('strength_formula', '') }}"
                     >
                     {% if errors.get('strength_formula') %}
@@ -156,7 +147,6 @@
                     <input
                         type="text"
                         name="toughness_formula"
-                        required
                         value="{{ form.get('toughness_formula', '') }}"
                     >
                     {% if errors.get('toughness_formula') %}
@@ -173,7 +163,6 @@
                     <input
                         type="text"
                         name="weapon_formula"
-                        required
                         value="{{ form.get('weapon_formula', '') }}"
                     >
                     {% if errors.get('weapon_formula') %}
@@ -188,7 +177,6 @@
                     <input
                         type="text"
                         name="armor_formula"
-                        required
                         value="{{ form.get('armor_formula', '') }}"
                     >
                     {% if errors.get('armor_formula') %}

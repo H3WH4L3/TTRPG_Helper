@@ -1,13 +1,15 @@
 import re
 import psycopg2
-from flask import Flask, render_template, request, redirect, url_for, g
+from flask import Flask, render_template, request, redirect, url_for, g, session
 from dotenv import load_dotenv
+from dataclasses import dataclass
 import os
 
 load_dotenv()
 
 
 app = Flask(__name__)
+app.secret_key = os.getenv("SECRET_KEY")
 connection = psycopg2.connect(
     dbname=os.getenv("DB_NAME"),
     user=os.getenv("DB_USER"),
@@ -106,7 +108,6 @@ def check_for_valid(form, table, slugs=None):
             errors["slug"] = VALIDATION_TEXT["slug"]
         elif form["slug"] in slugs:
             errors["slug"] = VALIDATION_TEXT["dublicate"]
-        form.pop("slug")
 
     # NAME
     if "name_ru" in form.keys():
@@ -114,7 +115,6 @@ def check_for_valid(form, table, slugs=None):
             errors["name_ru"] = VALIDATION_TEXT["empty"]
         elif not validate_form(name=form["name_ru"]):
             errors["name_ru"] = VALIDATION_TEXT["name"]
-        form.pop("name_ru")
 
     # DESCRIBE
     if "desc_ru" in form.keys():
@@ -122,7 +122,6 @@ def check_for_valid(form, table, slugs=None):
             errors["desc_ru"] = VALIDATION_TEXT["empty"]
         elif not validate_form(describe=form["desc_ru"]):
             errors["desc_ru"] = VALIDATION_TEXT["desc"]
-        form.pop("desc_ru")
 
     # TEXT
     if "text_ru" in form.keys():
@@ -130,7 +129,6 @@ def check_for_valid(form, table, slugs=None):
             errors["text_ru"] = VALIDATION_TEXT["empty"]
         elif not validate_form(describe=form["text_ru"]):
             errors["test_ru"] = VALIDATION_TEXT["desc"]
-        form.pop("text_ru")
 
     # ARMOR LEVE
     if "armor_level" in form.keys():
@@ -138,13 +136,11 @@ def check_for_valid(form, table, slugs=None):
             errors["armor_level"] = VALIDATION_TEXT["empty"]
         elif not validate_form(count=(form["armor_level"], 10)):
             errors["armor_level"] = VALIDATION_TEXT["count"].format(10)
-        form.pop("armor_level")
 
     # EFFECT
     if "effect" in form.keys() and form["effect"]:
         if not validate_form(describe=form["effect"]):
             errors["effect"] = VALIDATION_TEXT["desc"] + VALIDATION_TEXT["or_empty"]
-        form.pop("effect")
 
     # DAMAGE
     if "damage" in form.keys():
@@ -152,7 +148,6 @@ def check_for_valid(form, table, slugs=None):
             errors["damage"] = VALIDATION_TEXT["empty"]
         elif not validate_form(formula=form["damage"]):
             errors["damage"] = VALIDATION_TEXT["formula"]
-        form.pop("damage")
 
     # AMMO
     if "ammo" in form.keys() and form["ammo"]:
@@ -160,26 +155,23 @@ def check_for_valid(form, table, slugs=None):
             errors["ammo"] = (
                 VALIDATION_TEXT["count"].format(60) + VALIDATION_TEXT["or_empty"]
             )
-        form.pop("ammo")
 
     # COUNTS
     if "counts" in form.keys() and form["counts"]:
         if not validate_form(describe=form["counts"]):
             errors["counts"] = VALIDATION_TEXT["desc"] + VALIDATION_TEXT["or_empty"]
-        form.pop("counts")
 
     # COST
     if "cost" in form.keys() and form["cost"]:
         if not validate_form(describe=form["cost"]):
             errors["cost"] = VALIDATION_TEXT["desc"] + VALIDATION_TEXT["or_empty"]
-        form.pop("cost")
 
     # FORMULA
-    for key, value in form.items():
-        if key.endswith("formula"):
-            if not validate_form(formula=value):
-                errors[key] = VALIDATION_TEXT["formula"]
-        form.pop(key)
+    if form:
+        for key, value in form.items():
+            if key.endswith("formula"):
+                if not validate_form(formula=value):
+                    errors[key] = VALIDATION_TEXT["formula"]
 
     return errors
 
@@ -561,15 +553,12 @@ def add_item():
     return redirect(url_for("index"))
 
 
-class New_Character:
-    pass
-
-
+# PATH # 1
 @app.route("/path/class", methods=["POST", "GET"])
 def path_class():
-    if request.method == "POST":
-        errors = check_for_valid()
-    class_id = request.form.get("class_id", "").strip()
+    if request.method == "GET":
+        return render_template("add_class.html", form={}, errors={})
+
     columns = (
         "slug",
         "name_ru",
@@ -583,14 +572,183 @@ def path_class():
         "weapon_formula",
         "armor_forumla",
     )
+
     new_class = {}
     for column in columns:
         new_class[column] = request.form.get(column, "").strip()
 
-    errors = check_for_valid(new_class)
+    errors = check_for_valid(new_class, "classes")
+
     if errors:
-        return render_template("add_class.html", errors=errors, form=new_class)
-    return redirect(url_for("path/skills", class_id=class_id))
+        return render_template("add_class.html", form=new_class, errors=errors)
+
+    session["c_class"] = new_class
+
+    return redirect(url_for("path_skills"))
+
+
+# PATH # 2
+@app.route("/path/skills", methods=["POST", "GET"])
+def path_skills():
+    if request.method == "GET":
+        empty_skill = {"slug": "", "name_ru": "", "desc_ru": ""}
+        return render_template(
+            "add_skill.html",
+            form=[empty_skill],
+            errors=[{}],
+            choosen_class=session["c_class"]["name_ru"],
+        )
+
+    slugs = request.form.getlist("slug[]")
+    names = request.form.getlist("name_ru[]")
+    descs = request.form.getlist("desc_ru[]")
+
+    new_skill = []
+    errors = []
+
+    # VALIDATION
+    for i in range(len(slugs)):
+        form = {
+            "slug": slugs[i].strip(),
+            "name_ru": names[i].strip(),
+            "desc_ru": descs[i].strip(),
+        }
+        error = check_for_valid(form, " skills")
+        errors.append(error)
+        new_skill.append(form)
+
+    if any(errors):
+        return render_template(
+            "add_skill.html",
+            form=new_skill,
+            errors=errors,
+            choosen_class=session["c_class"]["name_ru"],
+        )
+    session["c_skill"] = new_skill
+
+    return redirect(url_for("path_bonuses"))
+
+
+# PATH # 3
+@app.route("/path/bonuses", methods=["POST", "GET"])
+def path_bonuses():
+    if request.method == "GET":
+        empty_bonus = {"slug": "", "name_ru": "", "desc_ru": ""}
+        return render_template(
+            "add_bonus.html",
+            form=[empty_bonus],
+            errors=[{}],
+            bonus_type="",
+            type_error="",
+            choosen_class=session["c_class"]["name_ru"],
+        )
+
+    bonus_type = request.form.get("bonus_type").strip()
+
+    if not validate_form(describe=bonus_type):
+        type_error = VALIDATION_TEXT["desc"]
+    else:
+        type_error = ""
+
+    slugs = request.form.getlist("slug[]")
+    names = request.form.getlist("name_ru[]")
+    descs = request.form.getlist("desc_ru[]")
+
+    # VALIDATION
+    new_bonus = []
+    errors = []
+
+    for i in range(len(slugs)):
+        form = {
+            "slug": slugs[i].strip(),
+            "name_ru": names[i].strip(),
+            "desc_ru": descs[i].strip(),
+        }
+        error = check_for_valid(form, "bonuses")
+
+        errors.append(error)
+        new_bonus.append(form)
+
+    if any(errors) or type_error:
+        return render_template(
+            "add_bonus.html",
+            form=new_bonus,
+            errors=errors,
+            bonus_type=bonus_type,
+            type_error=type_error,
+            choosen_class=session["c_class"]["name_ru"],
+        )
+
+    session["bonuses"] = new_bonus
+    session["bonus_type"] = bonus_type
+
+    return redirect(url_for("path_memories"))
+
+
+# PATH # 4
+@app.route("/path/memories", methods=["POST", "GET"])
+def path_memories():
+    if request.method == "GET":
+        empty_memorie = {"slug": "", "name_ru": "", "desc_ru": ""}
+        return render_template(
+            "add_memorie.html",
+            form=[empty_memorie],
+            errors=[{}],
+            memorie_type="",
+            type_error="",
+            choosen_class=session["c_class"]["name_ru"],
+        )
+
+    memorie_type = request.form.get("memorie_type").strip()
+
+    if not validate_form(describe=memorie_type):
+        type_error = VALIDATION_TEXT["desc"]
+    else:
+        type_error = ""
+
+    slugs = request.form.getlist("slug[]")
+    names = request.form.getlist("name_ru[]")
+    descs = request.form.getlist("desc_ru[]")
+
+    # VALIDATION
+    new_memorie = []
+    errors = []
+
+    for i in range(len(slugs)):
+        memorie_error = {}
+        form = {
+            "slug": slugs[i].strip(),
+            "name_ru": names[i].strip(),
+            "desc_ru": descs[i].strip(),
+        }
+        error = check_for_valid(form, "memories")
+        errors.append(error)
+        new_memorie.append(form)
+
+    if any(errors) or type_error:
+        return render_template(
+            "add_memorie.html",
+            form=new_memorie,
+            errors=errors,
+            memorie_type=memorie_type,
+            type_error=type_error,
+            choosen_class=session["c_class"]["name_ru"],
+        )
+
+    session["memories"] = new_memorie
+    session["memorie_type"] = memorie_type
+
+    return redirect(url_for("confirm_result"))
+
+
+@app.route("/path/confirm", methods=["POST", "GET"])
+def confirm_result():
+    print(session)
+    if request.method == "GET":
+        return render_template("confirm_result.html", session=session)
+    else:
+        print(session)
+    return redirect(url_for("index"))
 
 
 if __name__ == "__main__":

@@ -4,20 +4,24 @@
     <title>Document</title>
 </head>
 <body>
-    <form method="POST" action="/add_memorie">
+    <form method="POST">
 
         <!-- CLASSES -->
         <div class="class-block">
-            <select name="class_id">
-                {% for cls in classes %}
-                <option 
-                    value="{{ cls[0] }}" 
-                    {% if selected_class_id==cls[0]|string %}selected{% endif %}
-                >
-                    {{ cls[1] }}
-                </option>
-                {% endfor %}
-            </select>
+            {% if not choosen_class %}
+                <select name="class_id">
+                    {% for cls in classes %}
+                    <option 
+                        value="{{ cls[0] }}" 
+                        {% if selected_class_id==cls[0]|string %}selected{% endif %}
+                    >
+                        {{ cls[1] }}
+                    </option>
+                    {% endfor %}
+                </select>
+            {% else %}
+                <h1>{{ choosen_class }}</h1>
+            {% endif %}
         </div>
         
         <!-- TYPE OF MEMORIES-->

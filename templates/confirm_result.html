@@ -12,25 +12,26 @@
             <!-- Class -->
             <h1> Standart valuation of class</h1>
 
-            <p>{{ session['c_class']['name_ru'] }} </p>
-            <p>{{ session['c_class']['slug'] }} </p>
-            <p>{{ session['c_class']['desc_ru'] }} </p>
-            <p>{{ session['c_class']['hp_formula'] }} </p>
-            <p>{{ session['c_class']['signs_formula'] }} </p>
-            <p>{{ session['c_class']['agility_formula'] }} </p>
-            <p>{{ session['c_class']['presence_formula'] }} </p>
-            <p>{{ session['c_class']['strength_formula'] }} </p>
-            <p>{{ session['c_class']['toughness_formula'] }} </p>
-            <p>{{ session['c_class']['weapon_formula'] }} </p>
-            <p>{{ session['c_class']['armor_formula'] }} </p>
+            <p>{{ session['class']['name_ru'] }} </p>
+            <p>{{ session['class']['slug'] }} </p>
+            <p>{{ session['class']['desc_ru'] }} </p>
+            <p>{{ session['class']['hp_formula'] }} </p>
+            <p>{{ session['class']['money_formula'] }} </p>
+            <p>{{ session['class']['signs_formula'] }} </p>
+            <p>{{ session['class']['agility_formula'] }} </p>
+            <p>{{ session['class']['presence_formula'] }} </p>
+            <p>{{ session['class']['strength_formula'] }} </p>
+            <p>{{ session['class']['toughness_formula'] }} </p>
+            <p>{{ session['class']['weapon_formula'] }} </p>
+            <p>{{ session['class']['armor_formula'] }} </p>
 
             <!-- Skills -->
             <h1> All new skills </h1>
-            {% for i in range(session['c_skill']|length) %}
+            {% for i in range(session['skills']|length) %}
             <h3>Class # {{ i + 1 }}</h3>
-            <p>{{ session['c_skill'][i]['name_ru']}} </p>
-            <p>{{ session['c_skill'][i]['slug']}} </p>
-            <p>{{ session['c_skill'][i]['desc_ru']}} </p>
+            <p>{{ session['skills'][i]['name_ru']}} </p>
+            <p>{{ session['skills'][i]['slug']}} </p>
+            <p>{{ session['skills'][i]['desc_ru']}} </p>
             {% endfor %}
 
             <!-- Bonuses -->

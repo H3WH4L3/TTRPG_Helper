@@ -564,13 +564,14 @@ def path_class():
         "name_ru",
         "desc_ru",
         "hp_formula",
+        "money_formula",
         "signs_formula",
         "agility_formula",
         "presence_formula",
         "strength_formula",
         "toughness_formula",
         "weapon_formula",
-        "armor_forumla",
+        "armor_formula",
     )
 
     new_class = {}
@@ -582,7 +583,7 @@ def path_class():
     if errors:
         return render_template("add_class.html", form=new_class, errors=errors)
 
-    session["c_class"] = new_class
+    session["class"] = new_class
 
     return redirect(url_for("path_skills"))
 
@@ -596,7 +597,7 @@ def path_skills():
             "add_skill.html",
             form=[empty_skill],
             errors=[{}],
-            choosen_class=session["c_class"]["name_ru"],
+            choosen_class=session["class"]["name_ru"],
         )
 
     slugs = request.form.getlist("slug[]")
@@ -622,9 +623,9 @@ def path_skills():
             "add_skill.html",
             form=new_skill,
             errors=errors,
-            choosen_class=session["c_class"]["name_ru"],
+            choosen_class=session["class"]["name_ru"],
         )
-    session["c_skill"] = new_skill
+    session["skills"] = new_skill
 
     return redirect(url_for("path_bonuses"))
 
@@ -640,7 +641,7 @@ def path_bonuses():
             errors=[{}],
             bonus_type="",
             type_error="",
-            choosen_class=session["c_class"]["name_ru"],
+            choosen_class=session["class"]["name_ru"],
         )
 
     bonus_type = request.form.get("bonus_type").strip()
@@ -676,7 +677,7 @@ def path_bonuses():
             errors=errors,
             bonus_type=bonus_type,
             type_error=type_error,
-            choosen_class=session["c_class"]["name_ru"],
+            choosen_class=session["class"]["name_ru"],
         )
 
     session["bonuses"] = new_bonus
@@ -696,7 +697,7 @@ def path_memories():
             errors=[{}],
             memorie_type="",
             type_error="",
-            choosen_class=session["c_class"]["name_ru"],
+            choosen_class=session["class"]["name_ru"],
         )
 
     memorie_type = request.form.get("memorie_type").strip()
@@ -732,7 +733,7 @@ def path_memories():
             errors=errors,
             memorie_type=memorie_type,
             type_error=type_error,
-            choosen_class=session["c_class"]["name_ru"],
+            choosen_class=session["class"]["name_ru"],
         )
 
     session["memories"] = new_memorie
@@ -743,11 +744,41 @@ def path_memories():
 
 @app.route("/path/confirm", methods=["POST", "GET"])
 def confirm_result():
-    print(session)
     if request.method == "GET":
         return render_template("confirm_result.html", session=session)
-    else:
-        print(session)
+
+    # UPLOAD TO DB
+
+    # CLASS
+    keys, placeholders = execute_param(session["class"])
+    cursor.execute(
+        f"INSERT INTO classes ({keys}) VALUES ({placeholders}) RETURNING id;",
+        tuple(session["class"].values()),
+    )
+    class_id = cursor.fetchone()[0]
+
+    # SKILLS
+    for skill in session["skills"]:
+        upload_db_returning(skill, "skills", class_id)
+
+    # BONUSES
+    cursor.execute(
+        "UPDATE classes SET bonus_type = %s WHERE id = %s",
+        (session["bonus_type"], class_id),
+    )
+
+    for bonus in session["bonuses"]:
+        upload_db_returning(bonus, "bonuses", class_id)
+
+    # MEMORIES
+    cursor.execute(
+        "UPDATE classes SET memorie_type = %s WHERE id = %s",
+        (session["memorie_type"], class_id),
+    )
+    for memorie in session["memories"]:
+        upload_db_returning(memorie, "memories", class_id)
+    connection.commit()
+
     return redirect(url_for("index"))
 
 

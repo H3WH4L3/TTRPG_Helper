@@ -1,6 +1,15 @@
 import re
 import psycopg2
-from flask import Flask, render_template, request, redirect, url_for, g, session
+from flask import (
+    Flask,
+    render_template,
+    request,
+    redirect,
+    url_for,
+    g,
+    session,
+    jsonify,
+)
 from dotenv import load_dotenv
 import os
 
@@ -60,7 +69,6 @@ narrative_category_translator = {
 
 
 def simple_upload_db(db_fragment, table):
-
     keys, placeholders = execute_param(db_fragment)
     cursor.execute(
         f"""
@@ -75,15 +83,21 @@ def simple_upload_db(db_fragment, table):
 
 
 def upload_db_returning(db_fragment, table, class_id):
-
     keys, placeholders = execute_param(db_fragment)
+    slugs = download_all_slugs(table)
 
-    # UPLOAD ELEMENT TO MAIN TABLE
-    cursor.execute(
-        f"INSERT INTO {table} ({keys}) VALUES ({placeholders}) RETURNING id;",
-        tuple(db_fragment.values()),
-    )
-    element_id = cursor.fetchone()[0]
+    # UPLOAD OR DOWNLOAD MAIN BASE
+    if db_fragment["slug"] in slugs:
+        cursor.execute(
+            f"SELECT id, slug FROM {table} WHERE slug='{db_fragment["slug"]}'"
+        )
+        element_id = cursor.fetchone()[0]
+    else:
+        cursor.execute(
+            f"INSERT INTO {table} ({keys}) VALUES ({placeholders}) RETURNING id;",
+            tuple(db_fragment.values()),
+        )
+        element_id = cursor.fetchone()[0]
 
     # ADDING LINK BETWEEN ID
     cursor.execute(
@@ -91,11 +105,18 @@ def upload_db_returning(db_fragment, table, class_id):
     )
 
 
+def download_all_slugs(table):
+    with connection:
+        cursor.execute(f"SELECT slug FROM {table}")
+        slugs = [i[0] for i in cursor.fetchall()]
+    return slugs if slugs else None
+
+
 def check_for_valid(form, table, slugs=None):
     errors = {}
 
     # UNIQUE SLUGS
-    if not slugs:
+    if slugs is None:
         cursor.execute(f"SELECT slug FROM {table}")
         slugs = [i[0] for i in cursor.fetchall()]
 
@@ -105,8 +126,9 @@ def check_for_valid(form, table, slugs=None):
             errors["slug"] = VALIDATION_TEXT["empty"]
         elif not validate_form(slug=form["slug"]):
             errors["slug"] = VALIDATION_TEXT["slug"]
-        elif form["slug"] in slugs:
-            errors["slug"] = VALIDATION_TEXT["dublicate"]
+        if slugs != False:
+            if form["slug"] in slugs:
+                errors["slug"] = VALIDATION_TEXT["dublicate"]
 
     # NAME
     if "name_ru" in form.keys():
@@ -555,6 +577,7 @@ def add_item():
 # PATH # 1
 @app.route("/path/class", methods=["POST", "GET"])
 def path_class():
+    session.clear()
     if "final_step" not in session:
         session["final_step"] = False
     if request.method == "GET":
@@ -617,7 +640,7 @@ def path_skills():
             "name_ru": names[i].strip(),
             "desc_ru": descs[i].strip(),
         }
-        error = check_for_valid(form, "skills")
+        error = check_for_valid(form, "skills", slugs=False)
         errors.append(error)
         new_skill.append(form)
 
@@ -746,7 +769,9 @@ def path_memories():
 
     session["memories"] = new_memorie
     session["memorie_type"] = memorie_type
+    value = session.copy()
 
+    # return jsonify(value)
     return redirect(url_for("confirm_result"))
 
 
@@ -817,8 +842,8 @@ def confirm_result():
     )
     for memorie in session["memories"]:
         upload_db_returning(memorie, "memories", class_id)
-    connection.commit()
 
+    connection.commit()
     session.clear()
     return redirect(url_for("index"))
 

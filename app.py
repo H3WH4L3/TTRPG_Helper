@@ -93,7 +93,7 @@ def upload_db_returning(db_fragment, table, class_id):
     # UPLOAD OR DOWNLOAD MAIN BASE
     if db_fragment["slug"] in slugs:
         cursor.execute(
-            f"SELECT id, slug FROM {table} WHERE slug='{db_fragment["slug"]}'"
+            f"SELECT id, slug FROM {table} WHERE slug='{db_fragment['slug']}'"
         )
         element_id = cursor.fetchone()[0]
     else:
@@ -105,7 +105,7 @@ def upload_db_returning(db_fragment, table, class_id):
 
     # ADDING LINK BETWEEN ID
     cursor.execute(
-        f"INSERT INTO {"class_" + table} (class_id, {table + "_id"}) VALUES ({class_id}, {element_id});"
+        f"INSERT INTO {'class_' + table} (class_id, {table + '_id'}) VALUES ({class_id}, {element_id});"
     )
 
 

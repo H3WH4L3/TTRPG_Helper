@@ -55,7 +55,7 @@ class MBCharacter:
 
     @staticmethod
     def roll_dice(string):
-        pattern = r"(?:(\d*)d)?(\d+)([+\-])?(\d+)?"
+        pattern = r"(?:(\d*)d)?(\d+)([+\-*])?(\d+)?"
         match = re.fullmatch(pattern, string)
         if match:
             count, value, operator, bonus = match.groups()

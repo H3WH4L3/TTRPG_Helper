@@ -6,8 +6,9 @@ from dataclasses import dataclass
 import re
 import operator as op
 import os
+from dotenv import load_dotenv
 
-
+load_dotenv()
 OPERATORS = {"+": op.add, "-": op.sub, "//": op.floordiv, "*": op.mul}
 
 connection = psycopg2.connect(
@@ -94,7 +95,7 @@ class MBCharacter:
         data["bonus"] = {"type": ch_cls["bonus_type"]}
 
         cursor.execute(
-            "SELECT bonus_id FROM class_bonuses WHERE class_id = %s ORDER BY random() LIMIT 1;",
+            "SELECT bonuses_id FROM class_bonuses WHERE class_id = %s ORDER BY random() LIMIT 1;",
             (class_id,),
         )
         ch_bonus = cursor.fetchone()[0]
@@ -105,7 +106,7 @@ class MBCharacter:
 
         # Skills
         cursor.execute(
-            "SELECT skill_id FROM class_skills WHERE class_id = %s;", (class_id,)
+            "SELECT skills_id FROM class_skills WHERE class_id = %s;", (class_id,)
         )
         ch_skills = tuple(element[0] for element in cursor.fetchall())
 
@@ -136,7 +137,7 @@ class MBCharacter:
 
         # Memories
         cursor.execute(
-            "SELECT memorie_id FROM class_memories WHERE class_id = %s ORDER BY random() LIMIT 1;",
+            "SELECT memories_id FROM class_memories WHERE class_id = %s ORDER BY random() LIMIT 1;",
             (class_id,),
         )
         ch_memorie = cursor.fetchone()[0]
@@ -201,10 +202,3 @@ class MBCharacter:
             }
 
         self.character = Character(**data)
-
-
-test = MBCharacter()
-test.generate()
-
-for key, value in test.character.__dict__.items():
-    print(f"{key.ljust(15)} : {value}")

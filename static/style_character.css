@@ -1,0 +1,569 @@
+body {
+    background: rgb(255, 255, 38);
+    border: solid 10px;
+}
+/* CLASS */
+.class-block {
+    position: relative;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.class-frame{
+    position: relative;
+    width: 50%;
+}
+.class-frame img{
+    width: 100%;
+    display: block;
+}
+.class-frame .class-name {
+    position: absolute;
+    background: rgba(249, 75, 255, 0.9);
+    top: 50%;
+    left: 50%;    
+    transform: translate(-50%, -50%);
+    font-size: clamp(1.5rem, 2.5vw, 3rem);
+    text-align: center;
+}
+.describe-block {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+    border: 2px dotted black;
+    font-size: 20px;
+    font-weight: 550;
+
+    text-align: justify;
+}
+
+/* SKULL BLOCK */
+.squll-fragment {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 5%;
+    padding: 2%;
+}
+
+.squll-middle{
+    grid-column: 2;
+    grid-row: 1 / 3;
+}
+.squll-left{
+    grid-column: 1;
+    grid-row: 1 / 3;
+    position: relative;
+}
+
+.squll-right{
+    grid-column: 3;
+    grid-row: 1 / 3;
+    position: relative;
+}
+.narrative {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    text-align: center;
+    background: rgba(249, 75, 255, 0.9);
+    font-weight: 550;
+}
+
+.skull {
+    position: relative;
+    width: 100%;
+}
+.age{
+    display: flex;
+    width: 9%;
+    margin: 0 auto;
+    text-align: center;
+    padding-top: 0.5em;
+    flex-direction: column;
+}
+.age-name{
+    font-size: 35px;
+    padding: 0.2em;
+    font-weight: bold;
+    background: rgba(249, 75, 255, 0.9);
+}
+.age-text{
+    font-size: 30px;
+    font-weight: 550;
+    text-align: center;
+}
+.brain {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+.skull img {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+.skull .name {
+    position: absolute;
+    left: 50%;
+    top: 67%;
+    background: rgba(249, 75, 255, 0.9);
+
+    transform: translate(-50%, -50%);
+    font-size: 35px;
+    color: rgb(0, 0, 0);
+}
+.gender-female img {
+    width: 40%;
+}
+.gender-male img{
+    width: 25%;
+}
+.skull .gender-male {
+    position: absolute;
+    left: 20%;
+    top: 26%;
+}
+.skull .gender-female {
+    position: absolute;
+    left: 62%;
+    top: 28%
+}
+.skull .terrible-trait {
+    position: absolute;
+    top: 8%;
+    left: 32.5%;
+    background: rgba(249, 75, 255, 0.9);
+}
+.terrible-trait {
+    width: 35%;
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+.squll-left .memorie-block-left{
+  position: absolute;
+  top: 20%;
+  left: 5%;
+  right: 0;
+  width: 90%;
+  padding: 1em;
+
+  background: rgba(249, 75, 255, 0.9);
+  color: black;
+  font-size: 1.2em;
+  font-weight: bold;
+
+  box-sizing: border-box;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.squll-right .memorie-block-right{
+  position: absolute;
+  top: 20%;
+  left: 5%;
+  right: 0;
+  width: 90%;
+  padding: 1em;
+
+  background: rgba(249, 75, 255, 0.9);
+  color: black;
+  font-size: 1.2em;
+  font-weight: bold;
+
+  box-sizing: border-box;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* SECRET QUEST */
+.secret-quest {
+    display: flex;
+    flex-direction: column;
+    border: dotted;
+    width: 50%;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    padding: 0.2em;
+}
+.secret-quest-name {
+    font-size: 30px;
+    font-weight: bold;
+    background:rgba(249, 75, 255, 0.9) ;
+    width: 40%;
+    text-align: center;
+}
+.secret-quest-text {
+    font-size: 20px;
+    font-weight: 500;
+    text-align: center;
+}
+
+
+/*HEART BLOCK*/
+.heart-fragment {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 5%;
+  padding: 2%;
+}
+/* Картинка */
+.image {
+  grid-column: 2;
+  grid-row: 1 / 3;
+}
+/* Блоки статистики */
+.box {
+    display: grid;
+    grid-template-rows: 60% 40%;
+}
+.left {
+    grid-column: 1;
+}
+.right {
+    grid-column: 3;
+}
+.up {
+    grid-row: 1;
+}
+.down {
+    grid-row: 2;
+}
+.heart {
+    position: relative;
+    grid-row: 1 ;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.skills {
+    grid-row: 2;
+    border: solid;
+    display: flex;
+    flex-direction: column;
+    padding: 0.5em;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+.skill-element {
+    border: solid;
+    padding: 0.5em;
+    margin: 0.2em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.skill-name {
+    background:rgba(249, 75, 255, 0.9) ;
+    font-weight: bold;
+    font-size: 20px;
+}
+.skill-describe{
+    font-weight:500;
+    font-size: 18px;
+    text-align: justify;
+}
+.heart img {
+    display: flex;
+    align-items: center;
+}
+.hp-max {
+    position: absolute;
+    width: 12%;
+    border: solid ;
+    height: 15%;
+    top: 40%;
+    left: 41%;
+    background:rgba(249, 75, 255, 0.9) ;
+    font-size: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.hp-current {
+    position: absolute;
+    width: 12%;
+    border: solid ;
+    height: 15%;
+    top: 60%;
+    left: 41%;
+    background:rgba(249, 75, 255, 0.9) ;
+    font-size: 40px;
+}
+.signs {
+    position: absolute;
+    width: 30%;
+    height: 10%;
+    border: solid 5px rgba(249, 75, 255);
+    top: 97%;
+    left: 32%;
+    font-size: 40px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.sign-left {
+    position: absolute;
+    width: 14%;
+    font-size: 39px;
+    left: 18%;
+    top: 97%;
+    background:rgba(249, 75, 255, 0.9) ;
+
+    display: flex;
+    justify-content: center;
+}
+.sign-right {
+    position: absolute;
+    width: 14%;
+    font-size: 39px;
+    left: 64.4%;
+    top: 97%;
+    background:rgba(249, 75, 255, 0.9) ;
+
+    display: flex;
+    justify-content: center;
+}
+
+/* Внутри статистики */
+.ability {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.name {
+    font-size: 3.0em;
+    border-bottom: 4px double black;
+}
+.ability-name {
+    background: rgba(249, 75, 255, 0.9);
+
+}
+.value {
+    font-size: 3.5em;
+}
+
+/* BONUS */
+.bonus-fragment{
+    width: 50%;
+    margin: 0 auto;
+    padding: 2em;
+}
+.bonus-block{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: dotted;
+    padding: 0.5em;
+}
+.bonus-name{
+    font-size: 40px;
+    font-weight: bold;
+    background: rgba(249, 75, 255, 0.9);
+}
+.bonus-text{
+    padding: 1em;
+    font-size: 20px;
+    font-weight: 550;
+    text-align: center;
+}
+
+
+
+
+
+/* ITEMS */
+.equipment-fragment{
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: 5%;
+    padding: 2%;
+}
+
+.equip-middle {
+    grid-column: 2;
+    grid-row: 1 / 4;
+    position: relative;
+}
+.equip-left {
+    grid-column: 1;
+    grid-row: 1 / 4;
+    position: relative;
+}
+
+.equip-right {
+    grid-column: 3;
+    grid-row: 1 / 4;
+    position: relative;
+}
+
+.skelet-arm {
+    position: relative;
+    width: 100%;
+}
+.skelet-bot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+.skelet-bot img {
+    width: 80%;
+}
+.skelet-arm img {
+    width: 100%;
+    display: block;
+}
+
+.equip-left .weapon-name{
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    position: absolute;
+    top: 15%;
+    left: 60%;
+    right: 0;
+    width: 30%;
+    padding: 1em;
+
+    background: rgba(249, 75, 255, 0.9);
+    color: black;
+    font-size: clamp(1.5rem, 2.5vw, 4rem);
+    font-weight: bold;
+
+    box-sizing: border-box;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+.weapon-damage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.equip-left .weapon-damage{
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    position: absolute;
+    top: 40%;
+    left: 20%;
+    right: 0;
+    width: 30%;
+    padding: 1em;
+
+    background: rgba(249, 75, 255, 0.9);
+    color: black;
+    font-size: clamp(2rem, 3vw, 5rem);
+    font-weight: bold;
+
+    box-sizing: border-box;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.equip-right .armor-name{
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    position: absolute;
+    top: 15%;
+    left: 60%;
+    right: 0;
+    width: 30%;
+    padding: 1em;
+
+    background: rgba(249, 75, 255, 0.9);
+    color: black;
+    font-size: clamp(1.5rem, 2.5vw, 4rem);
+    font-weight: bold;
+
+    box-sizing: border-box;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+.armor-level {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.equip-right .armor-level{
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    position: absolute;
+    top: 40%;
+    left: 20%;
+    right: 0;
+    width: 30%;
+    padding: 1em;
+
+    background: rgba(249, 75, 255, 0.9);
+    color: black;
+    font-size: clamp(2rem, 3vw, 5rem);
+    font-weight: bold;
+
+    box-sizing: border-box;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+.items-layer {
+    position: absolute;
+    top: 2%;
+    left: 5%;
+    width: 90%;
+
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+.item-element {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+.equip-middle .item-element {
+    padding: 0.2em;
+    line-height: 1;
+    background: rgba(249, 75, 255, 0.9);
+    font-size: clamp(1.2rem, 2vw, 3rem);
+    font-weight: bold;
+}
+.squll-fragment,
+.equipment-fragment,
+.heart-fragment {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+.squll-left,
+.squll-middle,
+.squll-right,
+.equip-left,
+.equip-middle,
+.equip-right {
+    aspect-ratio: 3 / 5;
+}
+.money{
+    position: absolute;
+    top: 97%;
+    left: 40%;
+    display: flex;
+    flex-direction: column;
+}
+.money-name{
+    font-size: 30px;
+    background: rgba(249, 75, 255, 0.9);
+    font-weight: bold;
+}
+.money-text{
+    font-size: 35px;
+    font-weight: 800;
+    padding: 0.5em;
+    text-align: center;
+    border-bottom: solid;
+}

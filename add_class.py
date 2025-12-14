@@ -1,3 +1,4 @@
+from main_generate import MBCharacter
 import re
 import psycopg2
 from flask import (
@@ -31,8 +32,8 @@ VALIDATION_TEXT = {
     "empty": "Значение не может быть пустым",
     "slug": "Только латиница, нижний регистр, слова через _",
     "name": "Только кирриллица, слова разделяются пробелом, никаких символов",
-    "desc": "Только кориллица, допускается любой свободный форма, в конце точка",
-    "formula": "Только формат вида XdY/XdY±Z (3d6/3d6±2)",
+    "desc": "Только кириллица, допускается любая свободная форма, в конце точка",
+    "formula": "Только формат вида XdY/XdY±*Z (3d6/3d6±*2)",
     "dublicate": "Такой id уже есть в базе!",
     "count": "Только число от 0 до {} (включительно)",
     "or_empty": ". Либо оставьте пустым.",
@@ -45,9 +46,9 @@ def validate_form(slug=None, name=None, describe=None, formula=None, count=None)
     if name:
         return re.fullmatch(r"^[А-ЯЁ][а-яё]+(?: [А-ЯЁа-яё]+)*$", name)
     if describe:
-        return re.fullmatch(r"^[А-ЯЁ][А-ЯЁа-яё0-9 ,:;()\-!?]*\.$", describe)
+        return re.fullmatch(r"^[А-ЯЁ][А-ЯЁа-яёA-Za-z0-9 \.,:;()\-!?+]*\.$", describe)
     if formula:
-        return re.fullmatch(r"(?:(\d*)d)?(\d+)([+\-])?(\d+)?", formula)
+        return re.fullmatch(r"(?:(\d*)d)?(\d+)([+\-\*])?(\d+)?", formula)
     if count:
         return 0 <= int(count[0]) <= count[1]
 
@@ -112,7 +113,7 @@ def download_all_slugs(table):
     return slugs if slugs else None
 
 
-def check_for_valid(form, table, slugs=None):
+def check_for_valid(form, table, slugs=None, dublicate=True):
     errors = {}
 
     # UNIQUE SLUGS
@@ -126,7 +127,7 @@ def check_for_valid(form, table, slugs=None):
             errors["slug"] = VALIDATION_TEXT["empty"]
         elif not validate_form(slug=form["slug"]):
             errors["slug"] = VALIDATION_TEXT["slug"]
-        if slugs != False:
+        if dublicate:
             if form["slug"] in slugs:
                 errors["slug"] = VALIDATION_TEXT["dublicate"]
 
@@ -200,6 +201,7 @@ def check_for_valid(form, table, slugs=None):
 # MAIN PAGE
 @app.route("/")
 def index():
+    session.clear()
     return render_template("index.html")
 
 
@@ -577,7 +579,6 @@ def add_item():
 # PATH # 1
 @app.route("/path/class", methods=["POST", "GET"])
 def path_class():
-    session.clear()
     if "final_step" not in session:
         session["final_step"] = False
     if request.method == "GET":
@@ -640,7 +641,7 @@ def path_skills():
             "name_ru": names[i].strip(),
             "desc_ru": descs[i].strip(),
         }
-        error = check_for_valid(form, "skills", slugs=False)
+        error = check_for_valid(form, "skills", dublicate=False)
         errors.append(error)
         new_skill.append(form)
 
@@ -875,6 +876,17 @@ def delete_test():
         cursor.execute("DELETE FROM classes  WHERE slug LIKE 'test_%';")
 
     return "ok", 200
+
+
+@app.route("/generate_character", methods=["GET", "POST"])
+def generate_character():
+    test = MBCharacter()
+    test.generate()
+    ch = dict(test.character.__dict__.items())
+    for key, value in ch.items():
+        print(f"{key}:    {value}")
+
+    return render_template("character-test.html", character=ch)
 
 
 if __name__ == "__main__":

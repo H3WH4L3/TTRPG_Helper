@@ -1,5 +1,4 @@
 import psycopg2
-import json
 from random import randint, choice
 from psycopg2.extras import DictCursor
 from dataclasses import dataclass
@@ -7,6 +6,8 @@ import re
 import operator as op
 import os
 from dotenv import load_dotenv
+from typing import List
+from models.types import Armor, Weapon, Items, Skills
 
 load_dotenv()
 OPERATORS = {"+": op.add, "-": op.sub, "//": op.floordiv, "*": op.mul}
@@ -25,18 +26,9 @@ cursor = connection.cursor(cursor_factory=DictCursor)
 class Character:
     id: str
     name: str
-    age: int
     sex: str
     character_class: str
     description: str
-    hp: int
-    money: int
-    signs: int
-    skills: dict
-    agility: int
-    presence: int
-    strength: int
-    toughness: int
     bonus: str
     terrible_trait: str
     injurie: str
@@ -44,9 +36,20 @@ class Character:
     dangerous_past: str
     secret_quest: str
     memorie: str
-    armor: dict
-    weapon: dict
-    items: list
+
+    age: int
+    hp: int
+    money: int
+    signs: int
+    agility: int
+    presence: int
+    strength: int
+    toughness: int
+
+    skills: List[Skills]
+    armor: List[Armor]
+    weapon: List[Weapon]
+    items: List[Items]
 
 
 class MBCharacter:

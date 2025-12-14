@@ -1,3 +1,6 @@
+from playwright.sync_api import sync_playwright
+from pathlib import Path
+import tempfile
 from main_generate import MBCharacter
 import re
 import psycopg2
@@ -9,7 +12,7 @@ from flask import (
     url_for,
     g,
     session,
-    jsonify,
+    send_file,
 )
 from dotenv import load_dotenv
 import os
@@ -883,11 +886,30 @@ def generate_character():
     test = MBCharacter()
     test.generate()
     ch = dict(test.character.__dict__.items())
-    for key, value in ch.items():
-        print(f"{key}:    {value}")
 
-    return render_template("character-test.html", character=ch)
+    return render_template("character.html", character=ch)
+
+
+@app.route("/export_png")
+def export_png():
+    relative_url = request.args.get("url")
+    full_url = f"http://127.0.0.1:5000{relative_url}"
+
+    out_path = Path("character.png")
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page(viewport={"width": 1200, "height": 1600})
+
+        page.goto(full_url, wait_until="networkidle")
+
+        sheet = page.locator("#sheet")
+        sheet.screenshot(path=str(out_path))
+
+        browser.close()
+
+    return send_file(out_path, as_attachment=True, download_name="character.png")
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, threaded=True)

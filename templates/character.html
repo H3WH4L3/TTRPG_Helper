@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <title>Character</title>
-    <link rel="stylesheet" href="static/style_character.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_character.css') }}">
 </head>
 <body>
-
+<div id="sheet">
     <!-- CLASS -->
     <div class="class-fragment">
         <div class="class-block">
@@ -176,6 +176,13 @@
             </div>
         </div>
     </div>
-
+</div>
+<button id="export-png">Export PNG</button>
+<script>
+    document.getElementById("export-png").onclick = () => {
+        const url = encodeURIComponent(window.location.pathname);
+        window.location.href = `/export_png?url=${url}`;
+    };
+</script>
 </body>
 </html>

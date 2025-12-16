@@ -1,3 +1,4 @@
 #content_block_st, #right_menu_st, #bottom_block_st {
     border: 1px solid black;
+    padding: 10px 20px;
 }

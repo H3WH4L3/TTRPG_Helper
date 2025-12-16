@@ -105,7 +105,7 @@ class MBCharacter:
 
         cursor.execute("SELECT * FROM bonuses WHERE id = %s;", (ch_bonus,))
         ch_bonus = cursor.fetchone()
-        data["bonus"]["text"] = f"{ch_bonus["name_ru"]} : {ch_bonus["desc_ru"]}"
+        data["bonus"]["text"] = f"{ch_bonus['name_ru']} : {ch_bonus['desc_ru']}"
 
         # Skills
         cursor.execute(
@@ -149,7 +149,7 @@ class MBCharacter:
             (ch_memorie,),
         )
         ch_memorie = cursor.fetchone()
-        data["memorie"] = f"{ch_cls["memorie_type"]} {ch_memorie["desc_ru"]}"
+        data["memorie"] = f"{ch_cls['memorie_type']} {ch_memorie['desc_ru']}"
         # Armor
         if ch_cls["armor_formula"] is None:
             data["armor"] = {"name": "Нет брони", "level": 0, "effect": None}

@@ -13,18 +13,18 @@
             <div class="class-info">
                 <h1> Standart valuation of class</h1>
 
-                <p>{{ session['class']['name_ru'] }} </p>
-                <p>{{ session['class']['slug'] }} </p>
-                <p>{{ session['class']['desc_ru'] }} </p>
-                <p>{{ session['class']['hp_formula'] }} </p>
-                <p>{{ session['class']['money_formula'] }} </p>
-                <p>{{ session['class']['signs_formula'] }} </p>
-                <p>{{ session['class']['agility_formula'] }} </p>
-                <p>{{ session['class']['presence_formula'] }} </p>
-                <p>{{ session['class']['strength_formula'] }} </p>
-                <p>{{ session['class']['toughness_formula'] }} </p>
-                <p>{{ session['class']['weapon_formula'] }} </p>
-                <p>{{ session['class']['armor_formula'] }} </p>
+                <p>Имя: {{ session['class']['name_ru'] }} </p>
+                <p>Slug: {{ session['class']['slug'] }} </p>
+                <p>Описание: {{ session['class']['desc_ru'] }} </p>
+                <p>Здоровье: {{ session['class']['hp_formula'] }} </p>
+                <p>Деньги: {{ session['class']['money_formula'] }} </p>
+                <p>Знаки: {{ session['class']['signs_formula'] }} </p>
+                <p>Agility: {{ session['class']['agility_formula'] }} </p>
+                <p>Presence: {{ session['class']['presence_formula'] }} </p>
+                <p>Strength: {{ session['class']['strength_formula'] }} </p>
+                <p>Tpughness: {{ session['class']['toughness_formula'] }} </p>
+                <p>Weapon: {{ session['class']['weapon_formula'] }} </p>
+                <p>Armor: {{ session['class']['armor_formula'] }} </p>
 
                 <button type="submit" name="action" value="change_class">Change Class</button>
             </div>
@@ -34,9 +34,9 @@
                 <h1> All new skills </h1>
                 {% for i in range(session['skills']|length) %}
                 <h3>Class # {{ i + 1 }}</h3>
-                <p>{{ session['skills'][i]['name_ru']}} </p>
-                <p>{{ session['skills'][i]['slug']}} </p>
-                <p>{{ session['skills'][i]['desc_ru']}} </p>
+                <p>Название: {{ session['skills'][i]['name_ru']}} </p>
+                <p>Slug: {{ session['skills'][i]['slug']}} </p>
+                <p>Описание: {{ session['skills'][i]['desc_ru']}} </p>
                 {% endfor %}
 
                 <button type="submit" name="action" value="change_skills">Change Skills</button>
@@ -45,12 +45,12 @@
             <!-- Bonuses -->
             <div class="bonuses-info">
                 <h1> All new Bonuses</h1>
-                <h2> {{ session['bonus_type'] }}</h2>
+                <h2>Тип Бонуса: {{ session['bonus_type'] }}</h2>
                 {% for i in range(session['bonuses']|length) %}
                 <h3>Bonus # {{ i + 1 }}</h3>
-                <p>{{ session['bonuses'][i]['name_ru']}} </p>
-                <p>{{ session['bonuses'][i]['slug']}} </p>
-                <p>{{ session['bonuses'][i]['desc_ru']}} </p>
+                <p>Название: {{ session['bonuses'][i]['name_ru']}} </p>
+                <p>Slug: {{ session['bonuses'][i]['slug']}} </p>
+                <p>Описание: {{ session['bonuses'][i]['desc_ru']}} </p>
                 {% endfor %}
                 
                 <button type="submit" name="action" value="change_bonuses">Change Bonuses</button>
@@ -59,12 +59,12 @@
             <!-- Memories -->
             <div class="memories-info">
                 <h1> All memories </h1>
-                <h2> {{ session['memorie_type'] }}</h2>
+                <h2>Тип Воспоминаний {{ session['memorie_type'] }}</h2>
                 {% for i in range(session['memories']|length) %}
                 <h3>Memorie # {{ i + 1 }}</h3>
-                <p>{{ session['memories'][i]['name_ru']}} </p>
-                <p>{{ session['memories'][i]['slug']}} </p>
-                <p>{{ session['memories'][i]['desc_ru']}} </p>
+                <p>Название: {{ session['memories'][i]['name_ru']}} </p>
+                <p>Slug: {{ session['memories'][i]['slug']}} </p>
+                <p>Описание: {{ session['memories'][i]['desc_ru']}} </p>
                 {% endfor %}
 
                 <button type="submit" name="action" value="chane_memories">Change Memories</button>

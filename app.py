@@ -220,6 +220,9 @@ def index():
 # ADD NEW CLASS
 @app.route("/add_class", methods=["POST", "GET"])
 def add_class():
+    action = request.form.get("action")
+    if action == "back":
+        return redirect(url_for("index"))
     if request.method == "GET":
         return render_template("add_class.html", form={}, errors={})
 
@@ -256,6 +259,9 @@ def add_class():
 # ADD NEW SKILL
 @app.route("/add_skill", methods=["POST", "GET"])
 def add_skill():
+    action = request.form.get("action")
+    if action == "back":
+        return redirect(url_for("index"))
     # CLASSES
     cursor.execute("SELECT id, name_ru FROM classes")
     classes = cursor.fetchall()
@@ -311,6 +317,9 @@ def add_skill():
 # ADD NEW BONUS
 @app.route("/add_bonus", methods=["POST", "GET"])
 def add_bonus():
+    action = request.form.get("action")
+    if action == "back":
+        return redirect(url_for("index"))
     # CLASSES
     cursor.execute("SELECT id, name_ru FROM classes")
     classes = cursor.fetchall()
@@ -381,6 +390,9 @@ def add_bonus():
 # ADD NEW MEMORIE
 @app.route("/add_memorie", methods=["POST", "GET"])
 def add_memorie():
+    action = request.form.get("action")
+    if action == "back":
+        return redirect(url_for("index"))
     # CLASSES
     cursor.execute("SELECT id, name_ru FROM classes")
     classes = cursor.fetchall()
@@ -451,6 +463,9 @@ def add_memorie():
 # ADD NARRATIVE
 @app.route("/add_narrative", methods=["POST", "GET"])
 def add_narrative():
+    action = request.form.get("action")
+    if action == "back":
+        return redirect(url_for("index"))
     cursor.execute("SELECT DISTINCT category FROM narrative;")
     categories = [i[0] for i in cursor.fetchall()]
     categories = [(el, narrative_category_translator[el]) for el in categories]
@@ -491,6 +506,9 @@ def add_narrative():
 # ADD ARMOR
 @app.route("/add_armor", methods=["POST", "GET"])
 def add_armor():
+    action = request.form.get("action")
+    if action == "back":
+        return redirect(url_for("index"))
     table = "armors"
     if request.method == "GET":
         return render_template("add_armor.html", form={}, errors={})
@@ -526,6 +544,9 @@ def add_armor():
 # ADD WEAPON
 @app.route("/add_weapon", methods=["POST", "GET"])
 def add_weapon():
+    action = request.form.get("action")
+    if action == "back":
+        return redirect(url_for("index"))
     table = "weapons"
     if request.method == "GET":
         return render_template("add_weapon.html", form={}, errors={})
@@ -554,6 +575,9 @@ def add_weapon():
 # ADD ITEMS
 @app.route("/add_item", methods=["POST", "GET"])
 def add_item():
+    action = request.form.get("action")
+    if action == "back":
+        return redirect(url_for("index"))
     categories = [
         ("", "Ничего"),
         ("sacred_scroll", "Священный свиток"),
@@ -595,6 +619,9 @@ def add_item():
 # PATH # 1
 @app.route("/path/class", methods=["POST", "GET"])
 def path_class():
+    action = request.form.get("action")
+    if action == "back":
+        return redirect(url_for("index"))
     if "final_step" not in session:
         session["final_step"] = False
     if request.method == "GET":
@@ -634,6 +661,9 @@ def path_class():
 # PATH # 2
 @app.route("/path/skills", methods=["POST", "GET"])
 def path_skills():
+    action = request.form.get("action")
+    if action == "back":
+        return redirect(url_for("index"))
     if request.method == "GET":
         empty_skill = {"slug": "", "name_ru": "", "desc_ru": ""}
         return render_template(
@@ -679,6 +709,9 @@ def path_skills():
 # PATH # 3
 @app.route("/path/bonuses", methods=["POST", "GET"])
 def path_bonuses():
+    action = request.form.get("action")
+    if action == "back":
+        return redirect(url_for("index"))
     if request.method == "GET":
         empty_bonus = {"slug": "", "name_ru": "", "desc_ru": ""}
         return render_template(
@@ -738,6 +771,9 @@ def path_bonuses():
 # PATH # 4
 @app.route("/path/memories", methods=["POST", "GET"])
 def path_memories():
+    action = request.form.get("action")
+    if action == "back":
+        return redirect(url_for("index"))
     if request.method == "GET":
         empty_memorie = {"slug": "", "name_ru": "", "desc_ru": ""}
         return render_template(

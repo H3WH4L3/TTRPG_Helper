@@ -10,9 +10,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Кнопка Add
     if (addBtn) {
         addBtn.addEventListener("click", () => {
-            const firstBlock = container.querySelector(".bonus-block");
+            const firstBlock = container.querySelector(".main-block");
             if (!firstBlock) {
-                console.log("No .bonus-block to clone");
+                console.log("No .main-block to clone");
                 return;
             }
 
@@ -35,8 +35,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const removeBtn = event.target.closest(".remove");
         if (!removeBtn) return;
 
-        const blocks = container.querySelectorAll(".bonus-block");
-        const block = removeBtn.closest(".bonus-block");
+        const blocks = container.querySelectorAll(".main-block");
+        const block = removeBtn.closest(".main-block");
 
         if (!block) return;
 

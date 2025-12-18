@@ -4,53 +4,47 @@
 <head>
     <meta charset="UTF-8">
     <title>Add New Skill</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='add_form.css') }}">
+    <!-- <link rel="stylesheet" href="/static/add_form.css"> -->
 </head>
 
 <body>
     <form method="POST">
-
-        <!-- CLASSES -->
-        <div class="class-block">
-            {% if not choosen_class %}
-                <select name="class_id">
-                    {% for cls in classes %}
-                    <option 
-                        value="{{ cls[0] }}" 
-                        {% if selected_class_id==cls[0]|string %}selected{% endif %}
-                    >
-                        {{ cls[1] }}
-                    </option>
-                    {% endfor %}
-                </select>
-            {% else %}
-                <h1>{{ choosen_class }}</h1>
-            {% endif %}
+        <div class="page-title-block">
+            <span class="page-title">SKILLS</span>
+            <!-- CLASSES -->
+            <div class="choose-block">
+                {% if not choosen_class %}
+                    <select name="class_id">
+                        {% for cls in classes %}
+                        <option 
+                            value="{{ cls[0] }}" 
+                            {% if selected_class_id==cls[0]|string %}selected{% endif %}
+                        >
+                            {{ cls[1] }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                {% else %}
+                    <h1>{{ choosen_class }}</h1>
+                {% endif %}
+            </div>
         </div>
+        <button class="submit-button" type="submit" name="action" value="save">SUBMIT</button>
+        <button class="back-button" type="submit" name="action" value="back">GO BACK</button>
+
         
         <!-- SKILLS -->
         <div id="skills">
             {% for i in range(form|length) %}
-            <div class="skill-block">
-                <button type="button" class="remove">-</button>
-
-                <!-- SLUG -->
-                <div class="slug-block">
-                    <span class="input-title">SLUG</span>
-                    <input
-                        type="text"
-                        name="slug[]"
-                        value="{{ form[i].slug }}"
-                    >
-                    {% if errors[i].slug %}
-                        <div class="error">{{ errors[i].slug }}</div>
-                    {% endif %}
-                </div>
+            <div class="main-block">
+                <button type="submit" id="remove-button" class="remove">Remove</button>
 
                 <!-- NAME -->
                 <div class="name-block">
                     <span class="input-title">NAME</span>
                     <input
+                        class="input-form"
                         type="text"
                         name="name_ru[]"
                         value="{{ form[i].name_ru }}"
@@ -60,14 +54,24 @@
                     {% endif %}
                 </div>
 
-                <!-- DESCRIPTION -->
-                <div class="desc-block">
-                    <span class="input-title">DESCRIPTION</span>
+                <!-- SLUG -->
+                <div class="slug-block">
+                    <span class="input-title">SLUG</span>
                     <input
+                        class="input-form"
                         type="text"
-                        name="desc_ru[]"
-                        value="{{ form[i].desc_ru }}"
+                        name="slug[]"
+                        value="{{ form[i].slug }}"
                     >
+                    {% if errors[i].slug %}
+                        <div class="error">{{ errors[i].slug }}</div>
+                    {% endif %}
+                </div>
+
+                <!-- DESCRIPTION -->
+                <div class="text-block">
+                    <span class="input-title">DESCRIPTION</span>
+                    <textarea class="input-form" name="desc_ru[]">{{ form[i].desc_ru }}</textarea>
                     {% if errors[i].desc_ru %}
                         <div class="error">{{ errors[i].desc_ru }}</div>
                     {% endif %}
@@ -75,13 +79,11 @@
             </div>
             {% endfor %}
         </div>
-
-        <button type="button" id="add-skill">+</button>
-        <button type="submit" name="action" value="save">SUBMIT</button>
+        <div class="add-button-block">
+            <button type="submit" class="add-button" id="add-skill">Add</button>
+        </div>
     </form>
-
     <script src="{{ url_for('static', filename='skill_scripts.js') }}"></script>
 </body>
-
 
 </html>

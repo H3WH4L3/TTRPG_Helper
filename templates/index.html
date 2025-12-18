@@ -3,67 +3,98 @@
 
 <head>
     <title>Mork Borg</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='index_s.css') }}"> -->
+    <link rel="stylesheet" href="/static/index_s.css">
 </head>
 
 <body>
-    <div class="buttons">
-        <a href="{{ url_for('generate_character') }}">
-            <button>GENERATE</button>
-        </a>
-    </div>
-    <div class="buttons">
-        <a href="{{ url_for('add_skill') }}">
-            <button>Создать скилл</button>
-        </a>
+            <!-- HEADER -->
+    <div class="head-block">
+        <span class="head-title">Функционал Мастера</span>
     </div>
 
-    <div class="buttons">
-        <a href="{{ url_for('add_class') }}">
-            <button>Добавить класс</button>
-        </a>
+    <div class="main-block">
+        <div class="main-block-head">
+            <span class="main-block-title">Добавить</span>
+        </div>
+
+                <!-- MAIN BLOCK -->
+        <div class="main-block-elements">
+            <!-- SKILL -->
+            <div class="buttons">
+                <a href="{{ url_for('add_skill') }}">
+                    <button class="choose-button" type="submit" name="action">Cкилл</button>
+                </a>
+            </div>
+            <!-- CLASS -->
+            <div class="buttons">
+                <a href="{{ url_for('add_class') }}">
+                    <button class="choose-button" type="submit" name="action">Класс</button>
+                </a>
+            </div>
+            <!-- BONUS -->
+            <div class="buttons">
+                <a href="{{ url_for('add_bonus') }}">
+                    <button class="choose-button" type="submit" name="action">Бонус</button>
+                </a>
+            </div>
+            <!-- MEMORIES -->
+            <div class="buttons">
+                <a href="{{ url_for('add_memorie') }}">
+                    <button class="choose-button" type="submit" name="action">Воспоминание</button>
+                </a>
+            </div>
+            <!-- NARRATIVE -->
+            <div class="buttons">
+                <a href="{{ url_for('add_narrative') }}">
+                    <button class="choose-button" type="submit" name="action">Нарративный Элемент</button>
+                </a>
+            </div>
+            <!-- ARMOR -->
+            <div class="buttons">
+                <a href="{{ url_for('add_armor') }}">
+                    <button class="choose-button" type="submit" name="action">Броня</button>
+                </a>
+            </div>
+            <!-- WEAPON -->
+            <div class="buttons">
+                <a href="{{ url_for('add_weapon') }}">
+                    <button class="choose-button" type="submit" name="action">Оружие</button>
+                </a>
+            </div>
+            <!-- ITEMS -->
+            <div class="buttons">
+                <a href="{{ url_for('add_item') }}">
+                    <button class="choose-button" type="submit" name="action">Предмет</button>
+                </a>
+            </div>
+            <div class="buttons">
+                <a href="{{ url_for('path_class') }}">
+                    <button class="choose-button" type="submit" name="action">Полноценный Путь</button>
+                </a>
+            </div>
+        </div>
     </div>
 
-    <div class="buttons">
-        <a href="{{ url_for('add_bonus') }}">
-            <button>Добавить бонусы</button>
-        </a>
-    </div>
+    <div class="main-block">
+        <div class="main-block-head">
+            <span class="main-block-title">Просмотреть</span>
+        </div>
 
-    <div class="buttons">
-        <a href="{{ url_for('add_memorie') }}">
-            <button>Добавить воспоминания</button>
-        </a>
-    </div>
-
-    <div class="buttons">
-        <a href="{{ url_for('add_narrative') }}">
-            <button>Добавить нарративный элемент</button>
-        </a>
-    </div>
-
-    <div class="buttons">
-        <a href="{{ url_for('add_armor') }}">
-            <button>Добавить броню</button>
-        </a>
-    </div>
-
-    <div class="buttons">
-        <a href="{{ url_for('add_weapon') }}">
-            <button>Добавить оружие</button>
-        </a>
-    </div>
-
-    <div class="buttons">
-        <a href="{{ url_for('add_item') }}">
-            <button>Добавить предмет</button>
-        </a>
-    </div>
-
-    <div class="buttons">
-        <a href="{{ url_for('path_class') }}">
-            <button>Создать полноценный класс</button>
-        </a>
+        <!-- MAIN BLOCK -->
+        <div class="main-block-elements">
+            <!-- CHARACTER -->
+            <div class="buttons">
+                <a href="{{ url_for('generate_character') }}">
+                    <button class="choose-button" type="submit" name="action">Готовый Персонаж</button>
+                </a>
+            </div>
+    
+            <div class="buttons">
+                <a href="{{ url_for('library_page', section='skills') }}">
+                    <button class="choose-button" type="submit" name="action">Информация</button>
+                </a>
+            </div>
     </div>
 </body>
 

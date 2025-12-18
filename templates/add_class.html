@@ -3,18 +3,25 @@
 
 <head>
     <title>Add New Class</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='add_form.css') }}">
+    <!-- <link rel="stylesheet" href="/static/add_form.css"> -->
 </head>
 
 <body>
     <form method="POST" action="{{ url_for('path_class')}}">
-        <div id="class-block">
-            <div class="information-block">
+        <div class="page-title-block">
+            <span class="page-title">CLASS</span>
+        </div>
+        <button class="submit-button" type="submit" name="action" value="save">SUBMIT</button>
+        <button class="back-button" type="submit" name="action" value="back">GO BACK</button>
+
+        <div class="main-block">
                 <!-- NAME -->
                 <div class="name-block">
                     <span class="input-title">NAME</span>
                     
                     <input
+                        class="input-form"
                         type="text"
                         name="name_ru"
                         value="{{ form.get('name_ru', '') }}"
@@ -29,6 +36,7 @@
                     <span class="input-title">SLUG</span>
 
                     <input
+                        class="input-form"
                         type="text"
                         name="slug"
                         value="{{ form.get('slug', '') }}"
@@ -39,26 +47,20 @@
                 </div>
 
                 <!-- DESCRIPTION -->
-                <div class="desc-block">
+                <div class="text-block">
                     <span class="input-title">DESCRIPTION</span>
-
-                    <input
-                        type="text"
-                        name="desc_ru"
-                        value="{{ form.get('desc_ru', '') }}"
-                    >
+                    <textarea class="input-form" name="desc_ru">{{ form.get('desc_ru', '') }}</textarea>
                     {% if errors.get('desc_ru') %}
                         <div class="error">{{ errors['desc_ru'] }}</div>
                     {% endif %}
                 </div>
-            </div>
             
-            <div class="stats-block">
+            <div class="second-position">
                 <!-- HP -->
-                <div class="hp-block">
+                <div class="little-block">
                     <span class="input-title">HP</span>
-
                     <input
+                        class="input-form"
                         type="text"
                         name="hp_formula"
                         value="{{ form.get('hp_formula', '') }}"
@@ -69,10 +71,10 @@
                 </div>
 
                 <!-- MONEY -->
-                <div class="money-block">
+                <div class="little-block">
                     <span class="input-title">MONEY</span>
-
                     <input
+                        class="input-form"
                         type="text"
                         name="money_formula"
                         value="{{ form.get('money_formula','') }}"
@@ -83,10 +85,10 @@
                 </div>
 
                 <!-- SIGNS -->
-                <div class="signs-block">
+                <div class="little-block">
                     <span class="input-title">SIGNS</span>
-
                     <input
+                        class="input-form"
                         type="text"
                         name="signs_formula"
                         value="{{ form.get('signs_formula', '') }}"
@@ -97,12 +99,13 @@
                 </div>
             </div>
 
-            <div class="abilities-block">
+            <div class="third-position">
                 <!-- AGILITY -->
-                <div class="agility-block">
+                <div class="little-block">
                     <span class="input-title">AGILITY</span>
 
                     <input
+                        class="input-form"
                         type="text"
                         name="agility_formula"
                         value="{{ form.get('agility_formula', '') }}"
@@ -113,10 +116,11 @@
                 </div>
 
                 <!-- PRESENCE -->
-                <div class="presence-block">
+                <div class="little-block">
                     <span class="input-title">PRESENCE</span>
 
                     <input
+                        class="input-form"
                         type="text"
                         name="presence_formula"
                         value="{{ form.get('presence_formula', '') }}"
@@ -127,10 +131,11 @@
                 </div>
 
                 <!-- STRENGTH -->
-                <div class="strength-block">
+                <div class="little-block">
                     <span class="input-title">STRENGTH</span>
 
                     <input
+                        class="input-form"
                         type="text"
                         name="strength_formula"
                         value="{{ form.get('strength_formula', '') }}"
@@ -141,10 +146,11 @@
                 </div>
 
                 <!-- TOUGHNESS -->
-                <div class="toughness-block">
+                <div class="little-block">
                     <span class="input-title">TOUGHNESS</span>
 
                     <input
+                        class="input-form"
                         type="text"
                         name="toughness_formula"
                         value="{{ form.get('toughness_formula', '') }}"
@@ -155,12 +161,13 @@
                 </div>
             </div>
 
-            <div class="equipments-block">
+            <div class="second-position">
                 <!-- WEAPON -->
-                <div class="weapon-block">
+                <div class="little-block">
                     <span class="input-title">WEAPON</span>
 
                     <input
+                        class="input-form"
                         type="text"
                         name="weapon_formula"
                         value="{{ form.get('weapon_formula', '') }}"
@@ -171,10 +178,11 @@
                 </div>
 
                 <!-- ARMOR -->
-                <div class="armor-block">
+                <div class="little-block">
                     <span class="input-title">ARMOR</span>
 
                     <input
+                        class="input-form"
                         type="text"
                         name="armor_formula"
                         value="{{ form.get('armor_formula', '') }}"
@@ -185,7 +193,6 @@
                 </div>
             </div>
         </div>
-        <button type="submit" name="action" value="save">Add</button>
     </form>
 </body>
 

@@ -2,28 +2,22 @@
 <html lang="en">
 <head>
     <title>ARMOR</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='add_form.css') }}">
+    <!-- <link rel="stylesheet" href="/static/add_form.css"> -->
 </head>
 <body>
     <form method="POST" action="/add_armor">
-        <div class="armor-block">
-
-            <!-- SLUG -->
-            <div class="slug-block">
-                <span class="input-title">SLUG</span>
-                <input
-                    type="text"
-                    name="slug"
-                    value="{{ form.get('slug', '') }}"
-                >
-                {% if errors['slug'] %}
-                    <div class="error">{{ errors['slug'] }}</div>
-                {% endif %}
-            </div>
-
+        <div class="page-title-block">
+            <span class="page-title">ARMOR</span>
+        </div>
+        <button class="submit-button" type="submit" name="action" value="save">SUBMIT</button>
+        <button class="back-button" type="submit" name="action" value="back">GO BACK</button>
+        <div class="main-block">
             <!-- NAME -->
             <div class="name-block">
                 <span class="input-title">NAME</span>
                 <input
+                    class="input-form"
                     type="text"
                     name="name_ru"
                     value="{{ form.get('name_ru', '') }}"
@@ -32,35 +26,45 @@
                 <div class="error">{{ errors['name_ru'] }}</div>
                 {% endif %}
             </div>
+            <div class="second-position">
+                <!-- SLUG -->
+                <div class="slug-block">
+                    <span class="input-title">SLUG</span>
+                    <input
+                        class="input-form"
+                        type="text"
+                        name="slug"
+                        value="{{ form.get('slug', '') }}"
+                    >
+                    {% if errors['slug'] %}
+                        <div class="error">{{ errors['slug'] }}</div>
+                    {% endif %}
+                </div>
 
-            <!-- LEVEL -->
-            <div class="level-block">
-                <span class="input-title">ARMOR LEVEL</span>
-                <input
-                    type="number"
-                    name="armor_level"
-                    value="{{ form.get('armor_level', '') }}"
-                >
-                {% if errors['armor_level'] %}
-                <div class="error">{{ errors['armor_level'] }}</div>
-                {% endif %}
+                <!-- LEVEL -->
+                <div class="little-block">
+                    <span class="input-title">ARMOR LEVEL</span>
+                    <input
+                        class="input-form"
+                        type="text"
+                        name="armor_level"
+                        value="{{ form.get('armor_level', '') }}"
+                    >
+                    {% if errors['armor_level'] %}
+                    <div class="error">{{ errors['armor_level'] }}</div>
+                    {% endif %}
+                </div>
+
             </div>
-
             <!-- EFFECT -->
-            <div class="effect-block">
+            <div class="text-block">
                 <span class="input-title">EFFECT</span>
-                <input
-                    type="text"
-                    name="effect"
-                    value="{{ form.get('effect', '') }}"
-                >
+                <textarea class="input-form" name="effect">{{ form.get('effect', '') }}</textarea>
                 {% if errors['effect'] %}
                 <div class="error">{{ errors['effect'] }}</div>
                 {% endif %}
             </div>
-
         </div>
-        <button type="submit" name="action" value="save">SUBMIT</button>
     </form>
 </body>
 </html>

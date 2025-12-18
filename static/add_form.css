@@ -1,0 +1,130 @@
+
+.main-block {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-items: center;
+    background-color: yellow;
+    border: 4px black solid;
+    margin: 20px;
+    margin-bottom: 0px;
+    border-radius: 20px;
+}
+.page-title-block {
+    position: relative;
+    background-color: yellow; 
+    border: 4px solid black; 
+    text-align: center;
+    padding: 20px;
+    border-radius: 20px;
+}
+.page-title-block .page-title {
+    font-size: 30px;
+    padding: 10px;
+    width: 50%;
+    text-decoration: underline 2px;
+    letter-spacing: 10px;
+    font-weight: 650;
+    background: rgba(249, 75, 255, 0.9);
+    border-radius: 10px;
+}
+.page-title-block .form-type, .choose-block {
+    padding: 20px;
+}
+.submit-button, .back-button {
+    position: absolute;
+    width: 15%;
+    height: 5%;
+    border-radius: 10px;
+    border: solid black 2px;
+    background-color: white;
+}
+.back-button {
+    top: 5%;
+    left: 5%;
+    font-weight: 600;
+}
+.submit-button {
+    top: 5%;
+    right: 5%;
+    font-weight: 600;
+}
+.name-block, .slug-block, .little-block, .text-block, .form-type {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+}
+.second-position {
+    display: flex;
+    flex-direction: row;
+}
+.input-title{ 
+    font-size: 25px;
+    text-decoration: underline;
+    background: rgba(249, 75, 255, 0.9);
+    border-radius: 5px;
+    padding: 3px;
+    margin-bottom: 5px;
+    text-align: center;
+}
+.input-form {
+    height: 25px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 550;
+    text-align: center;
+    margin-bottom: 5px;
+}
+.error {
+    color: red;
+    font-weight: bold;
+    border: dotted 3px black;
+    font-size: 16px;
+}
+.little-block .input-form{
+    width: 45px;
+}
+.name-block .input-form {
+    width: 200%;
+}
+.text-block .input-form {
+    width: 200%;
+    height: 200%;
+}
+#remove-button{
+    position: absolute;
+    width: 15%;
+    height: 8%;
+    border-radius: 10px;
+    border: solid black 2px;
+    background-color: white;
+    top: 2%;
+    left: 1%;
+    font-size: 15px;
+    font-weight: 600;
+}
+.add-button-block {
+    display: flex;
+    justify-content: center;
+    margin: 5px;
+}
+.add-button-block .add-button {
+    font-size:16px;
+    width: 15%;
+    height: 5%;
+    border-radius: 10px;
+    border: solid black 2px;
+    background-color: white;
+    font-weight: 600;
+}
+.third-position {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+.third-position .little-block {
+    border: solid;
+    margin: 10px;
+    border-radius: 10px;
+}

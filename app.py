@@ -13,6 +13,7 @@ from flask import (
     g,
     session,
     send_file,
+    jsonify,
 )
 from dotenv import load_dotenv
 import os
@@ -199,6 +200,14 @@ def check_for_valid(form, table, slugs=None, dublicate=True):
                     errors[key] = VALIDATION_TEXT["formula"]
 
     return errors
+
+
+def show_table_info(table, keys):
+    with connection:
+        cursor.execute(f"SELECT {", ".join(keys)} FROM {table}")
+        values = cursor.fetchall()
+        elements = [dict(zip(keys, row)) for row in values]
+    return elements
 
 
 # MAIN PAGE
@@ -485,6 +494,10 @@ def add_armor():
     table = "armors"
     if request.method == "GET":
         return render_template("add_armor.html", form={}, errors={})
+
+    action = request.form.get("action")
+    if action == "back":
+        return redirect(url_for("index"))
 
     # GETTING ALL VALUES
     new_armor = {}
@@ -909,6 +922,43 @@ def export_png():
         browser.close()
 
     return send_file(out_path, as_attachment=True, download_name="character.png")
+
+
+@app.route("/library/<section>", methods=["GET", "POST"])
+def library_page(section):
+    if request.method == "POST":
+        action = request.form.get("action", "")
+        if action == "home":
+            return redirect(url_for("index"))
+
+    match section:
+        case "items":
+            rows = show_table_info(
+                "items", keys=["name_ru", "effect", "counts", "cost", "category"]
+            )
+            partial = "partials/items.html"
+        case "skills":
+            rows = show_table_info("skills", keys=["name_ru", "desc_ru"])
+            partial = "partials/skills.html"
+        case "armors":
+            rows = show_table_info("armors", keys=["name_ru", "armor_level"])
+            partial = "partials/armors.html"
+        case "weapons":
+            rows = show_table_info("weapons", keys=["name_ru", "damage"])
+            partial = "partials/weapons.html"
+        case "bonuses":
+            rows = show_table_info("bonuses", keys=["name_ru", "desc_ru"])
+            partial = "partials/bonuses.html"
+        case "memories":
+            rows = show_table_info("memories", keys=["name_ru", "desc_ru"])
+            partial = "partials/memories.html"
+        case "classes":
+            rows = show_table_info("classes", keys=["name_ru", "desc_ru"])
+            partial = "partials/classes.html"
+        case "narrative":
+            rows = show_table_info("narrative", keys=["category", "text_ru"])
+            partial = "partials/narrative.html"
+    return render_template("library.html", section=section, rows=rows, partial=partial)
 
 
 if __name__ == "__main__":

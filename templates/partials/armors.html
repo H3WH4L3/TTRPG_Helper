@@ -1,0 +1,12 @@
+<div class="main-block">
+    {% for el in rows %}
+        <div class="element">
+            <div class="name">
+                <span class="el">{{ el.name_ru }}</span>
+            </div>
+            <div class="main_info">
+                <span class="el">{{ el.armor_level }}</span>
+            </div>
+        </div>
+    {% endfor %}
+</div>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Character</title>
+    <link rel="stylesheet" href="static/style_character.css">
+</head>
+<body>
+<div id="sheet">
+    <!-- HEART -->
+    <div class="heart-fragment">
+
+        <!-- LEFT BLOCK-->
+        <div class="left up box">
+            <class class="ability name">
+                <span class="ability-name">AGILITY</span>
+            </class>
+            <class class="ability value">{{ character['agility'] }}</class>
+        </div>
+        <div class="left down box">
+            <class class="ability name">
+                <span class="ability-name">PRESENCE</span>
+            </class>
+            <span class="ability value">{{ character['presence'] }}</span>
+        </div>
+
+
+        <!-- HEART BLOCK -->
+        <div class="heart">
+            <img class="image" src="materials/heart.svg" alt="skull">
+            <div class="hp-max">{{ character['hp'] }}</div>
+            <div class="hp-current"></div>
+
+            <span class="sign-left">SI</span>
+            <div class="signs">
+                <span class="signs-value">{{ character['signs'] }}</span>
+            </div>
+            <span class="sign-right">GN</span>
+        </div>
+
+        <div class="skills">
+            {% for key, value in character['skills'].items() %}
+            <div class="skill-element">
+                <span class="skill-name">{{ key }}</span>
+                <br>
+                <span class="skill-describe">{{ value }}</span>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- RIGHT BLOCK-->
+        <div class="right up box">
+            <class class="ability name">
+                <span class="ability-name">STRENGTH</span>
+            </class>
+            <span class="ability value">{{ character['strength'] }}</span>
+        </div>
+        <div class="right down box">
+            <class class="ability name">
+                <span class="ability-name">TOUGHNESS</span>
+            </class>
+            <span class="ability value">{{ character['toughness'] }}</span>
+        </div>
+    </div>
+</div>
+</body>
+</html>

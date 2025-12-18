@@ -2,63 +2,60 @@
 <html lang="en">
 <head>
     <title>Document</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='add_form.css') }}">
+    <!-- <link rel="stylesheet" href="/static/add_form.css"> -->
 </head>
 <body>
     <form method="POST">
+        <div class="page-title-block">
+            <span class="page-title">MEMORIES</span>
+            <!-- TYPE OF MEMORIES-->
+            <div class="form-type">
+                <span class="input-title">TYPE OF MEMORIES</span>
+                <input
+                    class="input-form"
+                    type="text"
+                    name="memorie_type" 
+                    value="{{memorie_type}}"
+                >
+                {% if type_error %}
+                    <div class="error">{{ type_error }}</div>
+                {% endif %}
+            </div>
+            <!-- CLASSES -->
+            <div class="choose-block">
+                {% if not choosen_class %}
+                    <select name="class_id">
+                        {% for cls in classes %}
+                        <option 
+                            value="{{ cls[0] }}" 
+                            {% if selected_class_id==cls[0]|string %}selected{% endif %}
+                        >
+                            {{ cls[1] }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                {% else %}
+                    <h1>{{ choosen_class }}</h1>
+                {% endif %}
+            </div>
+        </div>
+        <button class="submit-button" type="submit" name="action" value="save">SUBMIT</button>
+        <button class="back-button" type="submit" name="action" value="back">GO BACK</button>
 
-        <!-- CLASSES -->
-        <div class="class-block">
-            {% if not choosen_class %}
-                <select name="class_id">
-                    {% for cls in classes %}
-                    <option 
-                        value="{{ cls[0] }}" 
-                        {% if selected_class_id==cls[0]|string %}selected{% endif %}
-                    >
-                        {{ cls[1] }}
-                    </option>
-                    {% endfor %}
-                </select>
-            {% else %}
-                <h1>{{ choosen_class }}</h1>
-            {% endif %}
-        </div>
         
-        <!-- TYPE OF MEMORIES-->
-        <div class="memorie-type">
-            <span class="input-title">TYPE OF MEMORIES</span>
-            <input
-                type="text"
-                name="memorie_type"
-                value="{{ memorie_type }}"
-            >
-            {% if type_error %}
-                <div class="error">{{ type_error }}</div>
-            {% endif %}
-        </div>
         <!-- MEMORIES -->
         <div id="memories">
             {% for i in range(form|length) %}
-            <div class="memorie-block">
-                <button type="button" class="remove">-</button>
+            <div class="main-block">
+                <button type="submit" id="remove-button" class="remove">Remove</button>
 
-                <!-- SLUG -->
-                <div class="slug-block">
-                    <span class="input-title">SLUG</span>
-                    <input
-                        type="text"
-                        name="slug[]"
-                        value="{{ form[i].slug }}"
-                    >
-                    {% if errors[i].slug %}
-                        <div class="error">{{ errors[i].slug }}</div>
-                    {% endif %}
-                </div>
 
                 <!-- NAME -->
                 <div class="name-block">
                     <span class="input-title">NAME</span>
                     <input
+                        class="input-form"
                         type="text"
                         name="name_ru[]"
                         value="{{ form[i].name_ru }}"
@@ -68,14 +65,24 @@
                     {% endif %}
                 </div>
 
-                <!-- DESCRIPTION -->
-                <div class="desc-block">
-                    <span class="input-title">DESCRIPTION</span>
+                <!-- SLUG -->
+                <div class="slug-block">
+                    <span class="input-title">SLUG</span>
                     <input
+                        class="input-form"
                         type="text"
-                        name="desc_ru[]"
-                        value="{{ form[i].desc_ru }}"
+                        name="slug[]"
+                        value="{{ form[i].slug }}"
                     >
+                    {% if errors[i].slug %}
+                        <div class="error">{{ errors[i].slug }}</div>
+                    {% endif %}
+                </div>
+            
+                <!-- DESCRIPTION -->
+                <div class="text-block">
+                    <span class="input-title">DESCRIPTION</span>
+                    <textarea class="input-form" name="desc_ru[]">{{ form[i].desc_ru }}</textarea>
                     {% if errors[i].desc_ru %}
                         <div class="error">{{ errors[i].desc_ru }}</div>
                     {% endif %}
@@ -83,9 +90,9 @@
             </div>
             {% endfor %}
         </div>
-
-        <button type="button" id="add-memorie">+</button>
-        <button type="submit" name="action" value="save">SUBMIT</button>
+        <div class="add-button-block">
+            <button type="submit" class="add-button" id="add-memorie">Add</button>
+        </div>
     </form>
 
     <script src="{{ url_for('static', filename='memorie_scripts.js') }}"></script>

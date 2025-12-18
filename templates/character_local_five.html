@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Character</title>
+    <link rel="stylesheet" href="static/style_character.css">
+</head>
+<body>
+<div id="sheet">
+    <!-- BONUS -->
+    <div class="bonus-fragment">
+        <div class="bonus-block">
+            <span class="bonus-name">{{ character['bonus']['type'] }}</span>
+            <span class="bonus-text">{{ character['bonus']['text'] }}</span>
+        </div>
+    </div>
+
+
+    <!-- EQUIPMENT -->
+    <div class="equipment-fragment">
+        <!-- WEAPON -->
+        <div class="equip-left">
+            <div class="skelet-arm">
+                <img src="materials/skelet-arm.svg" alt="skelet-arm">
+                <div class="weapon-name">{{ character['weapon']['name'] }}</div>
+                <div class="weapon-damage">{{ character['weapon']['damage'] }}</div>
+            </div>
+
+        </div>
+
+        <!-- ITEMS -->
+        <div class="equip-middle">
+            <div class="skelet-bot">
+                <img src="materials/skelet-bot.svg" alt="skelet-bot">
+                <div class="items-layer">
+                    {% for key, value in character['items'].items() %}
+                        <div class="item-element">{{ key }}</div>
+                    {% endfor %}
+                </div>
+            <div class="money">
+                <span class="money-name">Деньги</span>
+                <span class="money-text">{{ character['money'] }}</span>
+            </div>
+            </div>
+        </div>
+
+        <!-- ARMOR -->
+        <div class="equip-right">
+            <div class="skelet-arm">
+                <img src="materials/skelet-arm-right.svg" alt="sekelt-arm-right">
+                <div class="armor-name">{{ character['armor']['name'] }}</div>
+                <div class="armor-level">{{ character['armor']['level'] }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

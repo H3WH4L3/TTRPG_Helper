@@ -21,6 +21,15 @@ def show_all_classes():
         return [dict(i) for i in cursor.fetchall()]
 
 
+def show_info_classes(cls):
+    with get_connection() as con:
+        cursor = con.cursor()
+        cursor.execute(
+            "SELECT name_ru, desc_ru, hp_formula FROM classes WHERE name_ru=?;", (cls,)
+        )
+        return dict(cursor.fetchone())
+
+
 # region ITEMS
 def show_all_items():
     with get_connection() as con:

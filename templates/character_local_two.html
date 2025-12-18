@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Character</title>
+    <link rel="stylesheet" href="static/style_character.css">
+</head>
+<body>
+<div id="sheet">
+    <!-- SQULL -->
+    <div class="squll-fragment">
+        <!-- Left Position -->
+        <div class="squll-left">
+            <div class="brain">
+                <img src="materials/brain.svg" alt="brain">
+                <div class="memorie-block-left">{{ character['memorie'] }}</div>
+            </div>
+
+        </div>
+
+        <!-- Middle Position -->
+        <div class="squll-middle">
+            <div class="skull">
+                <img src="materials/squll.svg" alt="skull">
+                    <div class=" terrible-trait">{{ character['terrible_trait'] }}</div>
+
+                    {% if character['sex'] == 'Мужчина' %}
+                    <div class="gender-male">
+                        <img src="materials/gender-male.svg" alt="gender-male">
+                    </div>
+                    {% else %}
+                    <div class="gender-female">
+                        <img src="materials/gender-female.svg" alt="gender-female">
+                    </div>
+                    {% endif %}
+                <div class="name">{{ character['name'] }}</div>
+            </div>
+
+            <div class="narrative bad-habbit">{{ character['bad_habit'] }}</div>
+        </div>
+
+        <!-- Right Position -->
+        <div class="squll-right">
+            <div class="brain">
+                <img src="materials/brain-right.svg" alt="brain">
+                <div class="memorie-block-right">{{ character['dangerous_past'] }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>LIBRARY</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='library.css') }}">
+    <!-- <link rel="stylesheet" href="/static/library.css"> -->
+</head>
+<body>
+    <div class="tabs">
+        <a href="/library/items">Предметы</a>
+        <a href="/library/skills">Скилы</a>
+        <a href="/library/armors">Броня</a>
+        <a href="/library/weapons">Оружие</a>
+        <a href="/library/bonuses">Бонусы</a>
+        <a href="/library/memories">Воспоминания</a>
+        <a href="/library/classes">Классы</a>
+        <a href="/library/narrative">Нарратив</a>
+    </div>
+    <form method="POST">
+        <button class="submit-button" type="submit" name="action" value="home">HOME</button>
+    </form>
+
+    <div class="content">
+        {% include partial %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Character</title>
+    <link rel="stylesheet" href="static/style_character.css">
+</head>
+<body>
+<div id="sheet">
+    <!-- CLASS -->
+    <div class="class-fragment">
+        <div class="class-block">
+            <div class="class-frame">
+                <img src="materials/frame.svg" alt="frame-class">
+                <div class="class-name">{{ character['character_class'] }}</div>
+            </div>
+        </div>
+        <div class="age">
+            <span class="age-name">Возраст</span>
+            <span class="age-text">{{ character['age'] }}</span>
+        </div>
+
+        <div class="describe-block">
+            <span class="describe-text">{{ character['description'] }}</span>
+            <span class="injurie-text">{{ character['injurie'] }}</span>
+        </div>
+    </div>
+    
+    <!-- SQULL -->
+    <div class="squll-fragment">
+        <!-- Left Position -->
+        <div class="squll-left">
+            <div class="brain">
+                <img src="materials/brain.svg" alt="brain">
+                <div class="memorie-block-left">{{ character['memorie'] }}</div>
+            </div>
+
+        </div>
+
+        <!-- Middle Position -->
+        <div class="squll-middle">
+            <div class="skull">
+                <img src="materials/squll.svg" alt="skull">
+                    <div class=" terrible-trait">{{ character['terrible_trait'] }}</div>
+
+                    {% if character['sex'] == 'Мужчина' %}
+                    <div class="gender-male">
+                        <img src="materials/gender-male.svg" alt="gender-male">
+                    </div>
+                    {% else %}
+                    <div class="gender-female">
+                        <img src="materials/gender-female.svg" alt="gender-female">
+                    </div>
+                    {% endif %}
+                <div class="name">{{ character['name'] }}</div>
+            </div>
+
+            <div class="narrative bad-habbit">{{ character['bad_habit'] }}</div>
+        </div>
+
+        <!-- Right Position -->
+        <div class="squll-right">
+            <div class="brain">
+                <img src="materials/brain-right.svg" alt="brain">
+                <div class="memorie-block-right">{{ character['dangerous_past'] }}</div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- SECRET QUEST -->
+    <div class="secret-quest">
+        <span class="secret-quest-name">Секретный Твист</span>
+        <span class="secret-quest-text">{{ character['secret_quest'] }}</span>
+    </div>
+
+    <!-- HEART -->
+    <div class="heart-fragment">
+
+        <!-- LEFT BLOCK-->
+        <div class="left up box">
+            <class class="ability name">
+                <span class="ability-name">AGILITY</span>
+            </class>
+            <class class="ability value">{{ character['agility'] }}</class>
+        </div>
+        <div class="left down box">
+            <class class="ability name">
+                <span class="ability-name">PRESENCE</span>
+            </class>
+            <span class="ability value">{{ character['presence'] }}</span>
+        </div>
+
+
+        <!-- HEART BLOCK -->
+        <div class="heart">
+            <img class="image" src="materials/heart.svg" alt="skull">
+            <div class="hp-max">{{ character['hp'] }}</div>
+            <div class="hp-current"></div>
+
+            <span class="sign-left">SI</span>
+            <div class="signs">
+                <span class="signs-value">{{ character['signs'] }}</span>
+            </div>
+            <span class="sign-right">GN</span>
+        </div>
+
+        <div class="skills">
+            {% for key, value in character['skills'].items() %}
+            <div class="skill-element">
+                <span class="skill-name">{{ key }}</span>
+                <br>
+                <span class="skill-describe">{{ value }}</span>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- RIGHT BLOCK-->
+        <div class="right up box">
+            <class class="ability name">
+                <span class="ability-name">STRENGTH</span>
+            </class>
+            <span class="ability value">{{ character['strength'] }}</span>
+        </div>
+        <div class="right down box">
+            <class class="ability name">
+                <span class="ability-name">TOUGHNESS</span>
+            </class>
+            <span class="ability value">{{ character['toughness'] }}</span>
+        </div>
+    </div>
+
+    <!-- BONUS -->
+    <div class="bonus-fragment">
+        <div class="bonus-block">
+            <span class="bonus-name">{{ character['bonus']['type'] }}</span>
+            <span class="bonus-text">{{ character['bonus']['text'] }}</span>
+        </div>
+    </div>
+
+
+    <!-- EQUIPMENT -->
+    <div class="equipment-fragment">
+        <!-- WEAPON -->
+        <div class="equip-left">
+            <div class="skelet-arm">
+                <img src="materials/skelet-arm.svg" alt="skelet-arm">
+                <div class="weapon-name">{{ character['weapon']['name'] }}</div>
+                <div class="weapon-damage">{{ character['weapon']['damage'] }}</div>
+            </div>
+
+        </div>
+
+        <!-- ITEMS -->
+        <div class="equip-middle">
+            <div class="skelet-bot">
+                <img src="materials/skelet-bot.svg" alt="skelet-bot">
+                <div class="items-layer">
+                    {% for key, value in character['items'].items() %}
+                        <div class="item-element">{{ key }}</div>
+                    {% endfor %}
+                </div>
+            <div class="money">
+                <span class="money-name">Деньги</span>
+                <span class="money-text">{{ character['money'] }}</span>
+            </div>
+            </div>
+        </div>
+
+        <!-- ARMOR -->
+        <div class="equip-right">
+            <div class="skelet-arm">
+                <img src="materials/skelet-arm-right.svg" alt="sekelt-arm-right">
+                <div class="armor-name">{{ character['armor']['name'] }}</div>
+                <div class="armor-level">{{ character['armor']['level'] }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+<button id="export-png">Export PNG</button>
+<script>
+    document.getElementById("export-png").onclick = () => {
+        const url = encodeURIComponent(window.location.pathname);
+        window.location.href = `/export_png?url=${url}`;
+    };
+</script>
+</body>
+</html>

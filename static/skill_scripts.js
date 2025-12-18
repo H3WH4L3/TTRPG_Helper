@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Кнопка "+"
     addBtn.addEventListener("click", () => {
-        const firstBlock = container.querySelector(".skill-block");
+        const firstBlock = container.querySelector(".main-block");
         if (!firstBlock) return;
 
         const clone = firstBlock.cloneNode(true);
@@ -25,8 +25,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const removeBtn = event.target.closest(".remove");
         if (!removeBtn) return;
 
-        const blocks = container.querySelectorAll(".skill-block");
-        const block = removeBtn.closest(".skill-block");
+        const blocks = container.querySelectorAll(".main-block");
+        const block = removeBtn.closest(".main-block");
         if (!block) return;
 
         if (blocks.length > 1) {

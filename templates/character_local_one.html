@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Character</title>
+    <link rel="stylesheet" href="static/style_character.css">
+</head>
+<body>
+<div id="sheet">
+    <!-- CLASS -->
+    <div class="class-fragment">
+        <div class="class-block">
+            <div class="class-frame">
+                <img src="materials/frame.svg" alt="frame-class">
+                <div class="class-name">{{ character['character_class'] }}</div>
+            </div>
+        </div>
+        <div class="age">
+            <span class="age-name">Возраст</span>
+            <span class="age-text">{{ character['age'] }}</span>
+        </div>
+
+        <div class="describe-block">
+            <span class="describe-text">{{ character['description'] }}</span>
+            <span class="injurie-text">{{ character['injurie'] }}</span>
+        </div>
+    </div>
+</div>
+</body>
+</html>
